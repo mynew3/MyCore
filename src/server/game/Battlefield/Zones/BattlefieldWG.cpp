@@ -30,6 +30,7 @@
 #include "SpellAuras.h"
 #include "TemporarySummon.h"
 #include "WorldSession.h"
+#include "Language.h"
 
 BattlefieldWG::~BattlefieldWG()
 {
@@ -266,6 +267,8 @@ void BattlefieldWG::OnBattleStart()
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+	// WG Announcer
+	sWorld->SendWorldText(LANG_WG_ANNOUNCE_WORLD);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)

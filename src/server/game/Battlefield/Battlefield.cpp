@@ -29,6 +29,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
+#include "Language.h"
 
 Battlefield::Battlefield()
 {
@@ -143,6 +144,8 @@ bool Battlefield::Update(uint32 diff)
         m_StartGrouping = true;
         InvitePlayersInZoneToQueue();
         OnStartGrouping();
+    // WG Announcer
+      sWorld->SendWorldText(LANG_WG_ANNOUNCE15_WORLD);
     }
 
     bool objective_changed = false;
