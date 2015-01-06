@@ -21,6 +21,7 @@
 #include "AchievementMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "AnticheatMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
@@ -19565,6 +19566,12 @@ void Player::SaveToDB(bool create /*=false*/)
     ps << "', " << uint64(t) << ");";
     CharacterDatabase.PExecute(ps.str().c_str());
     /* World of Warcraft Armory */
+
+    // we save the data here to prevent spamming
+    sAnticheatMgr->SavePlayerData(this);
+
+    // in this way we prevent to spam the db by each report made!
+    // sAnticheatMgr->SavePlayerData(this);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())

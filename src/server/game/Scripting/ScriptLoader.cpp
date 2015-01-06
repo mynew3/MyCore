@@ -17,6 +17,7 @@
 
 #include "ScriptLoader.h"
 #include "World.h"
+#include "AnticheatMgr.h"
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -41,6 +42,7 @@ void AddSC_SmartScripts();
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_ahbot_commandscript();
+void AddSC_anticheat_commandscript();
 void AddSC_arena_commandscript();
 void AddSC_ban_commandscript();
 void AddSC_bf_commandscript();
@@ -698,6 +700,7 @@ void AddScripts()
     AddSpellScripts();
     AddSC_SmartScripts();
     AddCommandScripts();
+    sAnticheatMgr->StartScripts();
 #ifdef SCRIPTS
     AddWorldScripts();
     AddEasternKingdomsScripts();
@@ -733,6 +736,7 @@ void AddSpellScripts()
 
 void AddCommandScripts()
 {
+    AddSC_anticheat_commandscript();
     AddSC_account_commandscript();
     AddSC_achievement_commandscript();
     AddSC_ahbot_commandscript();
