@@ -1425,6 +1425,7 @@ void AddBattlegroundScripts()
 /* This is where custom scripts' loading functions should be declared. */
     void AddSC_custom();
 	void AddSC_DuelReset();
+	void AddSC_TeLe_gossip_codebox();
 #endif
 
 void AddCustomScripts()
@@ -1435,5 +1436,6 @@ void AddCustomScripts()
      AddSC_CS_Transmogrification();
      AddSC_DuelReset();
 	 AddSC_custom();
+	 AddSC_TeLe_gossip_codebox();
 #endif
 }

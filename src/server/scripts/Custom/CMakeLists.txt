@@ -28,6 +28,7 @@ set(scripts_STAT_SRCS
     Custom/Transmog/Transmogrification.cpp
     Custom/Transmog/Transmogrifier.cpp
 	Custom/mod_duel_reset.cpp
+	Custom/npc_teleporter.cpp
 )
 
 message("  -> Prepared: Custom")
