@@ -11757,6 +11757,12 @@ void Unit::Dismount()
         }
         else
             player->ResummonPetTemporaryUnSummonedIfAny();
+            Pet* plPet = player->GetPet();
+            if (plPet != NULL)
+            {
+                plPet->SetHealth(plPet->GetMaxHealth());
+                plPet->SetPower(plPet->getPowerType(), plPet->GetMaxPower(plPet->getPowerType()));
+            }
     }
 }
 

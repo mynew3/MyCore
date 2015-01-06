@@ -1424,6 +1424,7 @@ void AddBattlegroundScripts()
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
     void AddSC_custom();
+	void AddSC_DuelReset();
 #endif
 
 void AddCustomScripts()
@@ -1432,6 +1433,7 @@ void AddCustomScripts()
     /* This is where custom scripts should be added. */
      AddSC_PWS_Transmogrification();
      AddSC_CS_Transmogrification();
+     AddSC_DuelReset();
 	 AddSC_custom();
 #endif
 }
