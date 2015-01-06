@@ -161,10 +161,11 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_TRACK_BOTH_RESOURCES,
     CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA,
     CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA,
+	CONFIG_EXTERNAL_MAIL_ENABLE,
 
     // TrueWoW
     CONFIG_BATTLEGOUND_QUEUE_PLAYER_ANNOUNCE,
-
+    
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -349,6 +350,7 @@ enum WorldIntConfigs
     CONFIG_CHARTER_COST_ARENA_2v2,
     CONFIG_CHARTER_COST_ARENA_3v3,
     CONFIG_CHARTER_COST_ARENA_5v5,
+	CONFIG_EXTERNAL_MAIL_INTERVAL,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -793,6 +795,7 @@ class World
         time_t m_startTime;
         time_t m_gameTime;
         IntervalTimer m_timers[WUPDATE_COUNT];
+		IntervalTimer extmail_timer;
         time_t mail_timer;
         time_t mail_timer_expires;
         uint32 m_updateTime, m_updateTimeSum;
