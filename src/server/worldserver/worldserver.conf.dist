@@ -1532,7 +1532,14 @@ PreserveCustomChannels = 1
 #                     0  - (Disabled, Infinite channel storage)
 
 PreserveCustomChannelDuration = 14
-
+     
+# Includes satellite to search for work elsewhere LFG 
+# Default: 0 - Disable     
+#          1 - Enable     
+  
+LFG.Location.All = 0 
+#  
+# 
 #
 ###################################################################################################
 

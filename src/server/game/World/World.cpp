@@ -1231,6 +1231,9 @@ void World::LoadConfigSettings(bool reload)
 
     // MySQL ping time interval
     m_int_configs[CONFIG_DB_PING_INTERVAL] = sConfigMgr->GetIntDefault("MaxPingTime", 30);
+	
+	//LFG all
+	m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", true); 
 
  	// External Mail
     m_bool_configs[CONFIG_EXTERNAL_MAIL_ENABLE] = sConfigMgr->GetBoolDefault("External.Mail.Enable", false);
