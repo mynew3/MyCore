@@ -75,41 +75,134 @@ class spell_dru_dash : public SpellScriptLoader
         }
 };
 
+enum
+{
+    SPELL_DRUID_BEAR_FORM_PASSIVE           = 1178,
+    SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE      = 9635,
+    SPELL_DRUID_ENRAGE                      = 5229,
+    SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
+    SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726
+};
+
+// 1178 - Bear Form (Passive)
+// 9635 - Dire Bear Form (Passive)
+class spell_dru_bear_form_passive : public SpellScriptLoader
+{
+    public:
+        spell_dru_bear_form_passive() : SpellScriptLoader("spell_dru_bear_form_passive") { }
+
+        class spell_dru_bear_form_passive_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dru_bear_form_passive_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_ENRAGE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
+                    return false;
+                return true;
+            }
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                if (!GetUnitOwner()->HasAura(SPELL_DRUID_ENRAGE) || GetUnitOwner()->HasAura(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
+                    return;
+
+                int32 mod = 0;
+                switch (GetId())
+                {
+                    case SPELL_DRUID_BEAR_FORM_PASSIVE:
+                        mod = -27;
+                        break;
+                    case SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE:
+                        mod = -16;
+                        break;
+                    default:
+                        return;
+                }
+                amount += mod;
+            }
+
+            void Register() override
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_bear_form_passive_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_BASE_RESISTANCE_PCT);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_dru_bear_form_passive_AuraScript();
+        }
+};
+
 // 5229 - Enrage
 class spell_dru_enrage : public SpellScriptLoader
 {
     public:
         spell_dru_enrage() : SpellScriptLoader("spell_dru_enrage") { }
 
-        class spell_dru_enrage_SpellScript : public SpellScript
+        class spell_dru_enrage_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_dru_enrage_SpellScript);
+            PrepareAuraScript(spell_dru_enrage_AuraScript);
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_KING_OF_THE_JUNGLE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ENRAGE_MOD_DAMAGE))
+                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ENRAGE_MOD_DAMAGE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ENRAGED_DEFENSE)
+                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
                     return false;
                 return true;
             }
 
-            void OnHit()
+            void RecalculateBaseArmor()
             {
-                if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_0))
-                    GetHitUnit()->CastCustomSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetHitUnit(), true);
+                Unit::AuraEffectList const& auras = GetTarget()->GetAuraEffectsByType(SPELL_AURA_MOD_BASE_RESISTANCE_PCT);
+                for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+                {
+                    SpellInfo const* spellInfo = (*i)->GetSpellInfo();
+                    // Dire- / Bear Form (Passive)
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && spellInfo->SpellFamilyFlags.HasFlag(0x0, 0x0, 0x2))
+                        (*i)->RecalculateAmount();
+                }
+            }
+
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* target = GetTarget();
+                if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_0))
+                    target->CastCustomSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), target, true);
+
+                // Item - Druid T10 Feral 4P Bonus
+                if (target->HasAura(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
+                    target->CastSpell(target, SPELL_DRUID_ENRAGED_DEFENSE, true);
+
+                RecalculateBaseArmor();
+            }
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE);
+                GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGED_DEFENSE);
+
+                RecalculateBaseArmor();
             }
 
             void Register() override
             {
-                AfterHit += SpellHitFn(spell_dru_enrage_SpellScript::OnHit);
+                AfterEffectApply += AuraEffectApplyFn(spell_dru_enrage_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_dru_enrage_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
             }
         };
-
-        SpellScript* GetSpellScript() const override
+        AuraScript* GetAuraScript() const override
         {
-            return new spell_dru_enrage_SpellScript();
+            return new spell_dru_enrage_AuraScript();
         }
 };
+/*INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
+(1178,'spell_dru_bear_form_passive'),
+(9635,'spell_dru_bear_form_passive'); 
+*/
 
 // 54846 - Glyph of Starfire
 class spell_dru_glyph_of_starfire : public SpellScriptLoader
@@ -1138,4 +1231,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_typhoon();
     new spell_dru_t10_restoration_4p_bonus();
     new spell_dru_wild_growth();
+	new spell_dru_bear_form_passive();
 }
