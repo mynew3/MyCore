@@ -1967,6 +1967,8 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
 
         DealMeleeDamage(&damageInfo, true);
 
+        AfterProcAndDamage(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
+
         if (GetTypeId() == TYPEID_PLAYER)
             TC_LOG_DEBUG("entities.unit", "AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
                 GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
@@ -5002,6 +5004,14 @@ void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVict
     // Not much to do if no flags are set or there is no victim
     if (victim && victim->IsAlive() && procVictim)
         victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procAura, hitAmount);
+}
+
+void Unit::AfterProcAndDamage(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpell, SpellInfo const* procAura, uint32 hitAmount)
+{
+    if (procAttacker)
+        AfterProcAndDamageFor(false, victim, procAttacker, procExtra, attType, procSpell, amount, procAura, hitAmount);
+    if (victim && victim->IsAlive() && procVictim)
+        victim->AfterProcAndDamageFor(true, this, procVictim, procExtra, attType, procSpell, amount, procAura, hitAmount);
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
@@ -14514,6 +14524,62 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     // Cleanup proc requirements
     if (procExtra & (PROC_EX_INTERNAL_TRIGGERED | PROC_EX_INTERNAL_CANT_PROC))
         SetCantProc(false);
+}
+
+void Unit::AfterProcAndDamageFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, uint32 damage, SpellInfo const* procAura, uint32 hitDamage)
+{
+    // Player is loaded now - do not allow passive spell casts to proc
+    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetSession()->PlayerLoading())
+        return;
+
+    Unit* actor = isVictim ? target : this;
+    Unit* actionTarget = !isVictim ? target : this;
+
+    DamageInfo damageInfo = DamageInfo(actor, actionTarget, damage, procSpell, procSpell ? SpellSchoolMask(procSpell->SchoolMask) : SPELL_SCHOOL_MASK_NORMAL, SPELL_DIRECT_DAMAGE);
+    HealInfo healInfo = HealInfo(damage);
+    if (hitDamage)
+        healInfo = HealInfo(damage, hitDamage);
+    ProcEventInfo eventInfo = ProcEventInfo(actor, actionTarget, target, procFlag, 0, 0, procExtra, NULL, &damageInfo, &healInfo);
+
+    ProcTriggeredList procTriggered;
+    // Fill procTriggered list
+    for (AuraApplicationMap::const_iterator itr = GetAppliedAuras().begin(); itr != GetAppliedAuras().end(); ++itr)
+    {
+        ProcTriggeredData triggerData(itr->second->GetBase());
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (itr->second->HasEffect(i))
+                triggerData.effMask |= 1 << i;
+        }
+
+        if (triggerData.effMask)
+            procTriggered.push_front(triggerData);
+    }
+
+    // Nothing found
+    if (procTriggered.empty())
+        return;
+
+    // Handle effects proceed this time
+    for (ProcTriggeredList::const_iterator i = procTriggered.begin(); i != procTriggered.end(); ++i)
+    {
+        // look for aura in auras list, it1 may be removed while proc event processing
+        if (i->aura->IsRemoved())
+            continue;
+
+        AuraApplication* aurApp = i->aura->GetApplicationOfTarget(GetGUID());
+
+        for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
+        {
+            if (!(i->effMask & (1 << effIndex)))
+                continue;
+
+            AuraEffect* triggeredByAura = i->aura->GetEffect(effIndex);
+
+            i->aura->CallScriptAfterProcAndDamageHandlers(triggeredByAura, aurApp, eventInfo);
+        }
+    }
 }
 
 void Unit::GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo)

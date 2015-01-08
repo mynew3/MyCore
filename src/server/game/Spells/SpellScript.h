@@ -462,6 +462,7 @@ enum AuraScriptHookType
     AURA_SCRIPT_HOOK_EFFECT_PROC,
     AURA_SCRIPT_HOOK_EFFECT_AFTER_PROC,
     AURA_SCRIPT_HOOK_AFTER_PROC,
+    AURA_SCRIPT_HOOK_AFTER_PROC_AND_DAMAGE,
     /*AURA_SCRIPT_HOOK_APPLY,
     AURA_SCRIPT_HOOK_REMOVE, */
 };
@@ -787,6 +788,10 @@ class AuraScript : public _SpellScript
         // example: AfterEffectProc += AuraEffectProcFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier);
         // where function is: void function (AuraEffect const* aurEff, ProcEventInfo& procInfo);
         HookList<EffectProcHandler> AfterEffectProc;
+        // executed after aura proced and Damage Done
+        // example: AfterProcAndDamage += AuraEffectProcFn(class::function, EffectIndexSpecifier, EffectAuraNameSpecifier);
+        // where function is: void function (AuraEffect const* aurEff, ProcEventInfo& procInfo);
+        HookList<EffectProcHandler> AfterProcAndDamage;
         #define AuraEffectProcFn(F, I, N) EffectProcHandlerFunction(&F, I, N)
 
         // AuraScript interface - hook/effect execution manipulators

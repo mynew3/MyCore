@@ -2407,6 +2407,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         m_damage = damageInfo.damage;
 
         caster->DealSpellDamage(&damageInfo, true);
+
+        if (canEffectTrigger && missInfo != SPELL_MISS_REFLECT)
+            caster->AfterProcAndDamage(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell);
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
     else
