@@ -1661,9 +1661,15 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             default:
                break;
         }
+        if (target->HasAura(51713))
+            form = FORM_SHADOW_DANCE;
 
         // remove other shapeshift before applying a new one
+        if (form != FORM_SHADOW_DANCE && !target->HasAura(51713))
         target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, ObjectGuid::Empty, GetBase());
+
+        if (target->HasAura(1784) && form == FORM_SHADOW_DANCE)
+            form = FORM_STEALTH;
 
         // stop handling the effect if it was removed by linked event
         if (aurApp->GetRemoveMode())
