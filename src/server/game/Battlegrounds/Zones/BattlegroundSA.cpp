@@ -690,6 +690,18 @@ void BattlegroundSA::DemolisherStartState(bool start)
                 dem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
     }
+
+    // TW - Also do it for cannons.
+    for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10; i++)
+    {
+        if (Creature* gun = GetBGCreature(i))
+        {
+            if (start)
+                gun->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            else
+                gun->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
 }
 
 void BattlegroundSA::DestroyGate(Player* /*player*/, GameObject* /*go*/)
