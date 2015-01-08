@@ -1845,6 +1845,95 @@ class TW_npc_flesh_eating_insect : public CreatureScript
     }
 };
 
+enum PrayerofMending
+{
+    SPELL_PRAYER_OF_MENDING_HEAL = 33110
+};
+
+// 41635 - Prayer of Mending
+class TW_spell_pri_prayer_of_mending : public SpellScriptLoader
+{
+public:
+    TW_spell_pri_prayer_of_mending() : SpellScriptLoader("TW_spell_pri_prayer_of_mending") { }
+
+    class TW_spell_pri_prayer_of_mending_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(TW_spell_pri_prayer_of_mending_AuraScript);
+
+        bool Load()
+        {
+            proced = false;
+            return true;
+        }
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_PRAYER_OF_MENDING_HEAL))
+                return false;
+            return true;
+        }
+
+        void PreventProc(ProcEventInfo& /*eventInfo*/)
+        {
+            PreventDefaultAction();
+            proced = true;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            if (proced)
+            {
+                Unit* target = eventInfo.GetActionTarget();
+                SpellInfo const* spellProto = aurEff->GetSpellInfo();
+                int32 heal = aurEff->GetAmount();
+                ObjectGuid caster_guid = aurEff->GetCasterGUID();
+
+                // jumps
+                int32 jumps = aurEff->GetBase()->GetCharges() - 1;
+
+                // current aura expire
+                aurEff->GetBase()->SetCharges(1);             // will removed at next charges decrease
+
+                // next target selection
+                if (jumps > 0)
+                {
+                    if (Unit* caster = aurEff->GetCaster())
+                    {
+                        float radius = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].CalcRadius(caster);
+
+                        if (Unit* _target = target->GetNextRandomRaidMemberOrPet(radius))
+                        {
+                            target->CastCustomSpell(_target, spellProto->Id, &heal, NULL, NULL, true, NULL, aurEff, caster_guid);
+                            if (Aura* aura = _target->GetAura(spellProto->Id, caster->GetGUID()))
+                                aura->SetCharges(jumps);
+                        }
+                    }
+                }
+
+                // heal
+                target->CastCustomSpell(target, SPELL_PRAYER_OF_MENDING_HEAL, &heal, NULL, NULL, true, NULL, NULL, caster_guid);
+
+                // remove aura
+                aurEff->GetBase()->DropCharge();
+            }
+        }
+
+    private:
+        bool proced;
+
+        void Register() override
+        {
+            OnProc += AuraProcFn(TW_spell_pri_prayer_of_mending_AuraScript::PreventProc);
+            AfterProcAndDamage += AuraEffectProcFn(TW_spell_pri_prayer_of_mending_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new TW_spell_pri_prayer_of_mending_AuraScript();
+    }
+};
+
 void AddSC_custom_scripts()
 {
     new TW_npc_argent_squire();
@@ -1872,4 +1961,5 @@ void AddSC_custom_scripts()
     new spell_gen_landmine_knockback();
     new TW_npc_putricide_insect_trap();
     new TW_npc_flesh_eating_insect();
+    new TW_spell_pri_prayer_of_mending();
 }
