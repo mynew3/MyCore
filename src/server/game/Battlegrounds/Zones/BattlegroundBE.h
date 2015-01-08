@@ -50,6 +50,8 @@ class BattlegroundBE : public Arena
         /* inherited from BattlegroundClass */
         void StartingEventCloseDoors() override;
         void StartingEventOpenDoors() override;
+        bool HandlePlayerUnderMap(Player* player);
+        bool IsPlayerUnderMap(Player* player);
 
         void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
         bool SetupBattleground() override;

@@ -46,7 +46,8 @@ class BattlegroundRL : public Arena
         void FillInitialWorldStates(WorldPacket &d) override;
         void StartingEventCloseDoors() override;
         void StartingEventOpenDoors() override;
-
+        bool HandlePlayerUnderMap(Player* player);
+        bool IsPlayerUnderMap(Player* player);
         void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
         bool SetupBattleground() override;
 };

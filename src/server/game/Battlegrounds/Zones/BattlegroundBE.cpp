@@ -58,6 +58,17 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
             break;
     }
 }
+ 
+bool BattlegroundBE::HandlePlayerUnderMap(Player* player)
+{
+    player->TeleportTo(GetMapId(), 6237.79768f, 261.142f, 2.0f, 4.0f, false);
+    return true;
+}
+ 
+bool BattlegroundBE::IsPlayerUnderMap(Player* player)
+{
+    return player->GetPositionZ() < 0.5;
+}
 
 void BattlegroundBE::FillInitialWorldStates(WorldPacket& data)
 {

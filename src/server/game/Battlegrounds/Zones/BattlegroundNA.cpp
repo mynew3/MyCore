@@ -55,7 +55,18 @@ void BattlegroundNA::HandleAreaTrigger(Player* player, uint32 trigger)
             break;
     }
 }
+  
 
+bool BattlegroundNA::HandlePlayerUnderMap(Player* player)
+{
+    player->TeleportTo(GetMapId(), 4052.79868f, 2926.32f, 16.0f, 1.6f, false);     return true;
+}
+ 
+bool BattlegroundNA::IsPlayerUnderMap(Player* player)
+{
+    return player->GetPositionZ() < 11;
+}
++ 
 void BattlegroundNA::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(0xa11) << uint32(1);     // 9 show
