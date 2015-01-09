@@ -309,7 +309,8 @@ class boss_valithria_dreamwalker : public CreatureScript
 
             void Reset() override
             {
-                me->SetHealth(_spawnHealth);
+                //me->SetHealth(_spawnHealth); (Blizz)
+				me->SetHealth(me->GetMaxHealth() / 2); //(fun fo epc)
                 me->SetReactState(REACT_PASSIVE);
                 me->LoadCreaturesAddon(true);
                 // immune to percent heals
