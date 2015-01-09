@@ -3131,6 +3131,11 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->MaxAffectedTargets = 1;
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 33760;
                 break;
+            case 18754:     // Improved Succubus
+            case 18755:
+            case 18756:
+				spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+                break;
             case 17941: // Shadow Trance
             case 22008: // Netherwind Focus
             case 31834: // Light's Grace
