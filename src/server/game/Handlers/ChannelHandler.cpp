@@ -19,6 +19,7 @@
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "ChannelMgr.h"
 #include "Player.h"
+#include "Chat.h"
 
 #include <cctype>
 
@@ -50,6 +51,9 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (isdigit(channelName[0]))
         return;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
         cMgr->setTeam(GetPlayer()->GetTeam());
@@ -63,6 +67,9 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     uint32 unk;
     std::string channelName;
     recvPacket >> unk >> channelName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_LEAVE_CHANNEL %s Channel: %s, unk1: %u",
         GetPlayerInfo().c_str(), channelName.c_str(), unk);
@@ -83,6 +90,9 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "%s %s Channel: %s",
         recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
         GetPlayerInfo().c_str(), channelName.c_str());
@@ -96,6 +106,9 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
 {
     std::string channelName, password;
     recvPacket >> channelName >> password;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_PASSWORD %s Channel: %s, Password: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), password.c_str());
@@ -113,6 +126,9 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_SET_OWNER %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
@@ -129,6 +145,9 @@ void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_OWNER %s Channel: %s",
         GetPlayerInfo().c_str(), channelName.c_str());
 
@@ -141,6 +160,9 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_MODERATOR %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
@@ -158,6 +180,9 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_UNMODERATOR %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
@@ -173,6 +198,9 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_MUTE %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
@@ -190,6 +218,9 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_UNMUTE %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
@@ -205,6 +236,9 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_INVITE %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
@@ -222,6 +256,9 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_KICK %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
@@ -237,6 +274,9 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_BAN %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
@@ -254,6 +294,9 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_UNBAN %s Channel: %s, Target: %s",
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
@@ -269,6 +312,9 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_CHANNEL_ANNOUNCEMENTS %s Channel: %s",
         GetPlayerInfo().c_str(), channelName.c_str());
@@ -288,6 +334,9 @@ void WorldSession::HandleGetChannelMemberCount(WorldPacket &recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_GET_CHANNEL_MEMBER_COUNT %s Channel: %s",
         GetPlayerInfo().c_str(), channelName.c_str());
@@ -312,6 +361,9 @@ void WorldSession::HandleSetChannelWatch(WorldPacket &recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
 
     TC_LOG_DEBUG("chat.system", "CMSG_SET_CHANNEL_WATCH %s Channel: %s",
         GetPlayerInfo().c_str(), channelName.c_str());
