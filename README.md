@@ -1,4 +1,4 @@
-# ![logo](http://www.mediafire.com/convkey/c6ce/dbbp7p4u9sfcfwxzg.jpg?size_id=4) EWCore
+# ![logo](http://www.mediafire.com/convkey/c6ce/dbbp7p4u9sfcfwxzg.jpg?size_id=4) EpicCore
 
 + Platform: Linux, Windows or Mac
 + Processor with SSE2 support
