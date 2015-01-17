@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,19 +36,19 @@ class icecrown_citadel_teleport : public GameObjectScript
                 if (instance->GetBossState(DATA_LORD_MARROWGAR) == DONE)
                 {
                     if (go->GetEntry() != GO_SCOURGE_TRANSPORTER_LIGHTSHAMMER)
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to Light's Hammer.", GOSSIP_SENDER_ICC_PORT, LIGHT_S_HAMMER_TELEPORT);
+                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация в Молот света.", GOSSIP_SENDER_ICC_PORT, LIGHT_S_HAMMER_TELEPORT);
                     if (go->GetEntry() != GO_SCOURGE_TRANSPORTER_ORATORY)
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Oratory of the Damned.", GOSSIP_SENDER_ICC_PORT, ORATORY_OF_THE_DAMNED_TELEPORT);
+                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация в Молельню проклятых.", GOSSIP_SENDER_ICC_PORT, ORATORY_OF_THE_DAMNED_TELEPORT);
                 }
                 if (instance->GetBossState(DATA_LADY_DEATHWHISPER) == DONE && go->GetEntry() != GO_SCOURGE_TRANSPORTER_RAMPART)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Rampart of Skulls.", GOSSIP_SENDER_ICC_PORT, RAMPART_OF_SKULLS_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация в Черепной вал.", GOSSIP_SENDER_ICC_PORT, RAMPART_OF_SKULLS_TELEPORT);
                 if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE && go->GetEntry() != GO_SCOURGE_TRANSPORTER_DEATHBRINGER)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Deathbringer's Rise.", GOSSIP_SENDER_ICC_PORT, DEATHBRINGER_S_RISE_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация к Подъему смертоносного.", GOSSIP_SENDER_ICC_PORT, DEATHBRINGER_S_RISE_TELEPORT);
                 if (instance->GetData(DATA_UPPERSPIRE_TELE_ACT) == DONE && go->GetEntry() != GO_SCOURGE_TRANSPORTER_UPPERSPIRE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Upper Spire.", GOSSIP_SENDER_ICC_PORT, UPPER_SPIRE_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация в Шпиль.", GOSSIP_SENDER_ICC_PORT, UPPER_SPIRE_TELEPORT);
                 /// @todo Gauntlet event before Sindragosa
                 if (instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == DONE && go->GetEntry() != GO_SCOURGE_TRANSPORTER_SINDRAGOSA)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to Sindragosa's Lair", GOSSIP_SENDER_ICC_PORT, SINDRAGOSA_S_LAIR_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Телепортация в Логово Королевы Льда.", GOSSIP_SENDER_ICC_PORT, SINDRAGOSA_S_LAIR_TELEPORT);
             }
 
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());

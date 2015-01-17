@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -2443,7 +2443,7 @@ class ExactDistanceCheck
 
         bool operator()(WorldObject* unit)
         {
-            return _source->GetExactDist2d(unit) > _dist && !unit->ToUnit()->GetVehicleBase();
+           return _source->GetExactDist2d(unit) > _dist && !unit->ToUnit()->GetVehicleBase();
         }
 
     private:
@@ -2467,6 +2467,7 @@ class spell_the_lich_king_defile : public SpellScriptLoader
 
             void ChangeDamageAndGrow()
             {
+
                 SetHitDamage(int32(GetHitDamage() * GetCaster()->GetObjectScale()));
                 // HACK: target player should cast this spell on defile
                 // however with current aura handling auras cast by different units

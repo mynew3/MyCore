@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -148,7 +148,7 @@ class boss_lord_marrowgar : public CreatureScript
                 events.ScheduleEvent(EVENT_ENRAGE, 600000);
                 _boneSlice = false;
                 _boneSpikeImmune.clear();
-                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetReactState(REACT_DEFENSIVE);
             }
 
             void EnterCombat(Unit* /*who*/) override
@@ -181,15 +181,14 @@ class boss_lord_marrowgar : public CreatureScript
             }
 
             void MoveInLineOfSight(Unit* who) override
+
             {
                 if (!_introDone && me->IsWithinDistInMap(who, 70.0f))
                 {
                     Talk(SAY_ENTER_ZONE);
                     _introDone = true;
                 }
-                
-                if (me->IsWithinDist(who, 10.0f) && !me->IsInCombat())
-                    BossAI::MoveInLineOfSight(who);
+                BossAI::MoveInLineOfSight(who);
             }
 
             void UpdateAI(uint32 diff) override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,11 +38,7 @@ enum EventIds
     EVENT_ENEMY_GUNSHIP_DESPAWN     = 22861,
     EVENT_QUAKE                     = 23437,
     EVENT_SECOND_REMORSELESS_WINTER = 23507,
-    EVENT_TELEPORT_TO_FROSTMOURNE   = 23617,
-
-    // TrueWoW
-    EVENT_RELEASE_OOZE_VALVE        = 23426,
-    EVENT_RELEASE_GAS_VALVE         = 23438
+    EVENT_TELEPORT_TO_FROSTMOURNE   = 23617
 };
 
 enum TimedEvents
@@ -50,10 +46,7 @@ enum TimedEvents
     EVENT_UPDATE_EXECUTION_TIME = 1,
     EVENT_QUAKE_SHATTER         = 2,
     EVENT_REBUILD_PLATFORM      = 3,
-    EVENT_RESPAWN_GUNSHIP       = 4,
-
-    // TrueWoW
-    EVENT_SOFT_RESET_BUFF       = 8
+    EVENT_RESPAWN_GUNSHIP       = 4
 };
 
 DoorData const doorData[] =
@@ -137,12 +130,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 BloodQuickeningMinutes = 0;
                 // TW
                 CrimsonHallKillCount = 0;
-                InsectDeathCount = 0;
                 CrimsonHallDoorGUID.Clear();
-                OozeValveUsed = false;
-                GasValveUsed = false;
-                PutricideInsectSwarmEventState = NOT_STARTED;
-                IsBuffEnabled = true;
             }
 
             // A function to help reduce the number of lines for teleporter management.
@@ -179,14 +167,6 @@ class instance_icecrown_citadel : public InstanceMapScript
 
                 if (instance->IsHeroic() && HeroicAttempts)
                     player->SendUpdateWorldState(WORLDSTATE_ATTEMPTS_REMAINING, HeroicAttempts);
-
-                if (IsBuffEnabled)
-                {
-                    if (!player->HasAura(SPELL_HELLSCREAM_WARSONG_20) && player->GetTeam() == HORDE)
-                        player->AddAura(SPELL_HELLSCREAM_WARSONG_20, player);
-                    if (!player->HasAura(SPELL_STRENGTH_OF_WRYNN_20) && player->GetTeam() == ALLIANCE)
-                        player->AddAura(SPELL_STRENGTH_OF_WRYNN_20, player);
-                }
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -330,15 +310,6 @@ class instance_icecrown_citadel : public InstanceMapScript
                         // Remove corpse as soon as it dies (and respawn 10 seconds later)
                         creature->SetCorpseDelay(0);
                         creature->SetReactState(REACT_PASSIVE);
-                        break;
-                    case NPC_PUTRICIDE_TRAP:
-                        PutricideTrapGUID = creature->GetGUID();
-                        break;
-                    case NPC_FLESH_EATING_INSECT:
-                        if (creature->GetDBTableGUIDLow() == 201399)
-                            InsectsGuid[0] = creature->GetGUID();
-                        if (creature->GetDBTableGUIDLow() == 201611)
-                            InsectsGuid[1] = creature->GetGUID();
                         break;
                     default:
                         break;
@@ -500,21 +471,6 @@ class instance_icecrown_citadel : public InstanceMapScript
                             SaveToDB();
                         }
                         break;
-                    case NPC_FLESH_EATING_INSECT:
-                        InsectDeathCount++;
-                        if (InsectDeathCount == 2 && GetData(DATA_INSECT_SWARM_EVENT) == NOT_STARTED)
-                        {
-                            SetData(DATA_INSECT_SWARM_EVENT, IN_PROGRESS);
-                            if (Creature* trap = instance->GetCreature(PutricideTrapGUID))
-                                trap->AI()->DoAction(ACTION_START_TRAP_EVENT);
-                        }
-                        else if (InsectDeathCount >= 100)
-                        {
-                            SetData(DATA_INSECT_SWARM_EVENT, DONE);
-                            if (Creature* trap = instance->GetCreature(PutricideTrapGUID))
-                                trap->AI()->DoAction(ACTION_END_TRAP_EVENT);
-                        }
-                        break;
                     default:
                         break;
                 }
@@ -530,6 +486,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
                     case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
                     case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
+                    case GO_SCIENTIST_ENTRANCE:
                     case GO_BLOOD_ELF_COUNCIL_DOOR:
                     case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:
                     case GO_DOODAD_ICECROWN_BLOODPRINCE_DOOR_01:
@@ -710,16 +667,6 @@ class instance_icecrown_citadel : public InstanceMapScript
                         if (CrimsonHallKillCount == 4)
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case GO_OOZE_RELEASE_VALVE:
-                        OozeValveGUID = go->GetGUID();
-                        break;
-                    case GO_GAS_RELEASE_VALVE:
-                        GasValveGUID = go->GetGUID();
-                        break;
-                    case GO_SCIENTIST_ENTRANCE:
-                        PutricideGateGUID = go->GetGUID();
-                        AddDoor(go, true);
-                        break;
                     default:
                         break;
                 }
@@ -783,10 +730,6 @@ class instance_icecrown_citadel : public InstanceMapScript
                         return BloodQuickeningState;
                     case DATA_HEROIC_ATTEMPTS:
                         return HeroicAttempts;
-                    case DATA_INSECT_SWARM_EVENT:
-                        return PutricideInsectSwarmEventState;
-                    case DATA_IS_BUFF_ENABLED:
-                        return IsBuffEnabled;
                     default:
                         break;
                 }
@@ -948,13 +891,35 @@ class instance_icecrown_citadel : public InstanceMapScript
                         break;
                     case DATA_FESTERGUT:
                         if (state == DONE)
-                            if (GameObject* valve = instance->GetGameObject(GasValveGUID))
-                                valve->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        {
+                            if (GetBossState(DATA_ROTFACE) == DONE)
+                            {
+                                HandleGameObject(PutricideCollisionGUID, true);
+                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
+                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
+                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                            }
+                            else
+                                HandleGameObject(PutricideGateGUIDs[0], false);
+                            HandleGameObject(PutricidePipeGUIDs[0], true);
+                        }
                         break;
                     case DATA_ROTFACE:
                         if (state == DONE)
-                            if (GameObject* valve = instance->GetGameObject(OozeValveGUID))
-                                valve->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        {
+                            if (GetBossState(DATA_FESTERGUT) == DONE)
+                            {
+                                HandleGameObject(PutricideCollisionGUID, true);
+                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
+                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
+                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                            }
+                            else
+                                HandleGameObject(PutricideGateGUIDs[1], false);
+                            HandleGameObject(PutricidePipeGUIDs[1], true);
+                        }
                         break;
                     case DATA_PROFESSOR_PUTRICIDE:
                         HandleGameObject(PlagueSigilGUID, state != DONE);
@@ -1136,54 +1101,6 @@ class instance_icecrown_citadel : public InstanceMapScript
                             if (GameObject* go = instance->GetGameObject(TeleporterUpperSpireGUID))
                                 SetTeleporterState(go, true);
                             SaveToDB();
-                        }
-                        break;
-                    case DATA_INSECT_SWARM_EVENT:
-                        PutricideInsectSwarmEventState = data;
-                        switch (data)
-                        {
-                            case NOT_STARTED:
-                                InsectDeathCount = 0;
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                                HandleGameObject(PutricideCollisionGUID, true);
-
-                                for (ObjectGuid insects : InsectsGuid)
-                                {
-                                    if (Creature* insect = instance->GetCreature(insects))
-                                        if (!insect->IsAlive())
-                                            insect->Respawn(true);
-                                }
-                                break;
-                            case IN_PROGRESS:
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                    go->SetGoState(GO_STATE_ACTIVE);
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                    go->SetGoState(GO_STATE_ACTIVE);
-                                HandleGameObject(PutricideCollisionGUID, false);
-                                break;
-                            case DONE:
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                                if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                                HandleGameObject(PutricideCollisionGUID, true);
-                                HandleGameObject(PutricideGateGUID, true);
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case DATA_IS_BUFF_ENABLED:
-                        IsBuffEnabled = data;
-                        if (data == 0)
-                        {
-                            DoRemoveAurasDueToSpellOnPlayers(SPELL_HELLSCREAM_WARSONG_20);
-                            DoRemoveAurasDueToSpellOnPlayers(SPELL_STRENGTH_OF_WRYNN_20);
-                            SoftResetTimer.CancelEvent(EVENT_SOFT_RESET_BUFF); // Prevents having multiple instances of the event running.
-                            SoftResetTimer.ScheduleEvent(EVENT_SOFT_RESET_BUFF, 30 * MINUTE * IN_MILLISECONDS);
                         }
                         break;
                     default:
@@ -1419,19 +1336,6 @@ class instance_icecrown_citadel : public InstanceMapScript
 
             void Update(uint32 diff) override
             {
-                SoftResetTimer.Update(diff); // Always updated.
-                
-                while (uint32 eventId = SoftResetTimer.ExecuteEvent())
-                {
-                    if (eventId == EVENT_SOFT_RESET_BUFF)
-                    {
-                        if (instance->GetPlayers().isEmpty())
-                            IsBuffEnabled = true;
-                        else
-                            SoftResetTimer.ScheduleEvent(EVENT_SOFT_RESET_BUFF, 30 * MINUTE * IN_MILLISECONDS);
-                    }
-                }
-
                 if (BloodQuickeningState != IN_PROGRESS && GetBossState(DATA_THE_LICH_KING) != IN_PROGRESS && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != FAIL)
                     return;
 
@@ -1550,42 +1454,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                             }
                         }
                         break;
-                    case EVENT_RELEASE_GAS_VALVE:
-                        HandleGameObject(PutricidePipeGUIDs[0], true);
-                        GasValveUsed = true;
-                        if (OozeValveUsed)
-                        {
-                            HandleGameObject(PutricideCollisionGUID, true);
-                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                            HandleGameObject(PutricideGateGUID, false);
-                        }
-                        else
-                            HandleGameObject(PutricideGateGUIDs[0], false);
-                        break;
-                    case EVENT_RELEASE_OOZE_VALVE:
-                        HandleGameObject(PutricidePipeGUIDs[1], true);
-                        OozeValveUsed = true;
-                        if (GasValveUsed)
-                        {
-                            HandleGameObject(PutricideCollisionGUID, true);
-                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[0]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                            if (GameObject* go = instance->GetGameObject(PutricideGateGUIDs[1]))
-                                go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                            HandleGameObject(PutricideGateGUID, false);
-                        }
-                        else
-                            HandleGameObject(PutricideGateGUIDs[1], false);
-                        break;
                 }
             }
 
         protected:
             EventMap Events;
-            EventMap SoftResetTimer;
             ObjectGuid LadyDeathwisperElevatorGUID;
             ObjectGuid GunshipGUID;
             ObjectGuid EnemyGunshipGUID;
@@ -1650,18 +1523,8 @@ class instance_icecrown_citadel : public InstanceMapScript
             bool IsOrbWhispererEligible;
 
             // TW
-            uint8 IsBuffEnabled;
-            uint8 PutricideInsectSwarmEventState;
             uint32 CrimsonHallKillCount;
-            uint32 InsectDeathCount;
-            ObjectGuid PutricideTrapGUID;
             ObjectGuid CrimsonHallDoorGUID;
-            ObjectGuid OozeValveGUID;
-            ObjectGuid GasValveGUID;
-            ObjectGuid PutricideGateGUID;
-            ObjectGuid InsectsGuid[2];
-            bool OozeValveUsed;
-            bool GasValveUsed;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override
