@@ -695,13 +695,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_PVPSTATS                               = 797,
     RBAC_PERM_COMMAND_MODIFY_XP                              = 798,
 
-    // custom permissions 1006+
-    RBAC_PERM_COMMAND_QUESTCOMPLETER                         = 1002,
-    RBAC_PERM_COMMAND_QUESTCOMPLETER_STATUS                  = 1003,
-    RBAC_PERM_COMMAND_QUESTCOMPLETER_ADD                     = 1004,
-    RBAC_PERM_COMMAND_QUESTCOMPLETER_DEL                     = 1005,
-    RBAC_PERM_COMMAND_QUEUE                                  = 1006,
-    RBAC_PERM_COMMAND_RBG_QUEUE_LOOKUP                       = 1007,
+    // custom permissions 1000+
     RBAC_PERM_MAX
 };
 
