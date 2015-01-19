@@ -23,9 +23,6 @@
 #include "ScriptMgr.h"
 #include "SHA1.h"
 #include "PacketLog.h"
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 #include <memory>
 
 using boost::asio::ip::tcp;
@@ -175,10 +172,6 @@ bool WorldSocket::ReadDataHandler()
         case CMSG_KEEP_ALIVE:
             TC_LOG_DEBUG("network", "%s", opcodeName.c_str());
             sScriptMgr->OnPacketReceive(_worldSession, packet);
-#ifdef ELUNA
-            if (!sEluna->OnPacketReceive(_worldSession, packet))
-                break;
-#endif
             break;
         default:
         {

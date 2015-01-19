@@ -81,10 +81,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "GameObjectAI.h"
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 #include "../../../scripts/Custom/Transmog/Transmogrification.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
@@ -5187,10 +5183,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // update visibility
     UpdateObjectVisibility();
-
-#ifdef ELUNA
-    sEluna->OnResurrect(this);
-#endif
 
     if (!applySickness)
         return;
@@ -12588,9 +12580,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
 
-#ifdef ELUNA
-        sEluna->OnEquip(this, pItem2, bag, slot);
-#endif
         return pItem2;
     }
 
@@ -12602,9 +12591,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
-#ifdef ELUNA
-        sEluna->OnEquip(this, pItem, bag, slot);
-#endif
     return pItem;
 }
 
@@ -12630,9 +12616,6 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
-#ifdef ELUNA
-        sEluna->OnEquip(this, pItem, (pos >> 8), slot);
-#endif
     }
 }
 
@@ -25246,9 +25229,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         if (loot->containerID > 0)
             loot->DeleteLootItemFromContainerItemDB(item->itemid);
 
-#ifdef ELUNA
-        sEluna->OnLootItem(this, newitem, item->count, this->GetLootGUID());
-#endif
     }
     else
         SendEquipError(msg, NULL, NULL, item->itemid);

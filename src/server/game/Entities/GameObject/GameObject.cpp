@@ -33,9 +33,6 @@
 #include "UpdateFieldFlags.h"
 #include "World.h"
 #include "Transport.h"
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 #include <G3D/Quat.h>
 
 GameObject::GameObject() : WorldObject(false), MapObject(),
@@ -103,9 +100,7 @@ void GameObject::CleanupsBeforeDelete(bool finalCleanup)
     WorldObject::CleanupsBeforeDelete(finalCleanup);
 
     if (m_uint32Values)                                      // field array can be not exist if GameOBject not loaded
-    {
         RemoveFromOwner();
-    }
 }
 
 void GameObject::RemoveFromOwner()
@@ -131,9 +126,6 @@ void GameObject::AddToWorld()
     ///- Register the gameobject for guid lookup
     if (!IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnAddToWorld(this);
-#endif
         if (m_zoneScript)
             m_zoneScript->OnGameObjectCreate(this);
 
@@ -159,9 +151,6 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
-#endif
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
