@@ -4,13 +4,14 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
-#include "HookMgr.h"
+#include "Hooks.h"
 #include "LuaEngine.h"
 #include "ElunaBinding.h"
 #include "ElunaEventMgr.h"
 #include "ElunaIncludes.h"
 #include "ElunaTemplate.h"
 #include "ElunaUtility.h"
+#include "ElunaCreatureAI.h"
 
 #ifdef USING_BOOST
 #include <boost/filesystem.hpp>
@@ -42,8 +43,35 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::Initialize()
 {
-    ASSERT(!initialized);
+    LOCK_ELUNA;
+    ASSERT(!IsInitialized());
 
+    LoadScriptPaths();
+
+    // Must be before creating GEluna
+    // This is checked on Eluna creation
+    initialized = true;
+
+    // Create global eluna
+    GEluna = new Eluna();
+}
+
+void Eluna::Uninitialize()
+{
+    LOCK_ELUNA;
+    ASSERT(IsInitialized());
+
+    delete GEluna;
+    GEluna = NULL;
+
+    lua_scripts.clear();
+    lua_extensions.clear();
+
+    initialized = false;
+}
+
+void Eluna::LoadScriptPaths()
+{
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
 
     lua_scripts.clear();
@@ -63,43 +91,28 @@ void Eluna::Initialize()
         lua_requirepath.erase(lua_requirepath.end() - 1);
 
     ELUNA_LOG_DEBUG("[Eluna]: Loaded %u scripts in %u ms", uint32(lua_scripts.size() + lua_extensions.size()), ElunaUtil::GetTimeDiff(oldMSTime));
-
-    initialized = true;
-
-    // Create global eluna
-    GEluna = new Eluna();
 }
 
-void Eluna::Uninitialize()
+void Eluna::_ReloadEluna()
 {
-    ASSERT(initialized);
+    LOCK_ELUNA;
+    ASSERT(IsInitialized());
 
-    delete GEluna;
-    GEluna = NULL;
-
-    lua_scripts.clear();
-    lua_extensions.clear();
-
-    initialized = false;
-}
-
-void Eluna::ReloadEluna()
-{
     eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
 
-    EventMgr::ProcessorSet oldProcessors;
-    {
-        EventMgr::ReadGuard guard(sEluna->eventMgr->GetLock());
-        oldProcessors = sEluna->eventMgr->processors;
-    }
-    Uninitialize();
-    Initialize();
-    {
-        EventMgr::WriteGuard guard(sEluna->eventMgr->GetLock());
-        sEluna->eventMgr->processors.insert(oldProcessors.begin(), oldProcessors.end());
-    }
+    // Remove all timed events
+    sEluna->eventMgr->RemoveEvents();
 
-    // in multithread foreach: run scripts
+    // Close lua
+    sEluna->CloseLua();
+
+    // Reload script paths
+    LoadScriptPaths();
+
+    // Open new lua and libaraies
+    sEluna->OpenLua();
+
+    // Run scripts from laoded paths
     sEluna->RunScripts();
 
 #ifdef TRINITY
@@ -116,31 +129,76 @@ void Eluna::ReloadEluna()
 }
 
 Eluna::Eluna() :
-L(luaL_newstate()),
-
 event_level(0),
 push_counter(0),
+enabled(false),
 
+L(NULL),
 eventMgr(NULL),
 
-ServerEventBindings(new EventBind<HookMgr::ServerEvents>("ServerEvents", *this)),
-PlayerEventBindings(new EventBind<HookMgr::PlayerEvents>("PlayerEvents", *this)),
-GuildEventBindings(new EventBind<HookMgr::GuildEvents>("GuildEvents", *this)),
-GroupEventBindings(new EventBind<HookMgr::GroupEvents>("GroupEvents", *this)),
-VehicleEventBindings(new EventBind<HookMgr::VehicleEvents>("VehicleEvents", *this)),
-BGEventBindings(new EventBind<HookMgr::BGEvents>("BGEvents", *this)),
+ServerEventBindings(NULL),
+PlayerEventBindings(NULL),
+GuildEventBindings(NULL),
+GroupEventBindings(NULL),
+VehicleEventBindings(NULL),
+BGEventBindings(NULL),
 
-PacketEventBindings(new EntryBind<HookMgr::PacketEvents>("PacketEvents", *this)),
-CreatureEventBindings(new EntryBind<HookMgr::CreatureEvents>("CreatureEvents", *this)),
-CreatureGossipBindings(new EntryBind<HookMgr::GossipEvents>("GossipEvents (creature)", *this)),
-GameObjectEventBindings(new EntryBind<HookMgr::GameObjectEvents>("GameObjectEvents", *this)),
-GameObjectGossipBindings(new EntryBind<HookMgr::GossipEvents>("GossipEvents (gameobject)", *this)),
-ItemEventBindings(new EntryBind<HookMgr::ItemEvents>("ItemEvents", *this)),
-ItemGossipBindings(new EntryBind<HookMgr::GossipEvents>("GossipEvents (item)", *this)),
-playerGossipBindings(new EntryBind<HookMgr::GossipEvents>("GossipEvents (player)", *this)),
+PacketEventBindings(NULL),
+CreatureEventBindings(NULL),
+CreatureGossipBindings(NULL),
+GameObjectEventBindings(NULL),
+GameObjectGossipBindings(NULL),
+ItemEventBindings(NULL),
+ItemGossipBindings(NULL),
+playerGossipBindings(NULL),
 
-CreatureUniqueBindings(new UniqueBind<HookMgr::CreatureEvents>("CreatureEvents", *this))
+CreatureUniqueBindings(NULL)
 {
+    ASSERT(IsInitialized());
+
+    OpenLua();
+
+    // Replace this with map insert if making multithread version
+    //
+
+    // Set event manager. Must be after setting sEluna
+    // on multithread have a map of state pointers and here insert this pointer to the map and then save a pointer of that pointer to the EventMgr
+    eventMgr = new EventMgr(&Eluna::GEluna);
+}
+
+Eluna::~Eluna()
+{
+    CloseLua();
+
+    delete eventMgr;
+    eventMgr = NULL;
+}
+
+void Eluna::CloseLua()
+{
+    OnLuaStateClose();
+
+    DestroyBindStores();
+
+    // Must close lua state after deleting stores and mgr
+    if (L)
+        lua_close(L);
+    L = NULL;
+}
+
+void Eluna::OpenLua()
+{
+    CreateBindStores();
+
+    enabled = eConfigMgr->GetBoolDefault("Eluna.Enabled", true);
+    if (!IsEnabled())
+    {
+        ELUNA_LOG_INFO("[Eluna]: Eluna is disabled in config");
+        return;
+    }
+
+    L = luaL_newstate();
+
     // open base lua libraries
     luaL_openlibs(L);
 
@@ -164,25 +222,33 @@ CreatureUniqueBindings(new UniqueBind<HookMgr::CreatureEvents>("CreatureEvents",
     lua_pushstring(L, ""); // erase cpath
     lua_setfield(L, -2, "cpath");
     lua_pop(L, 1);
-
-    // Replace this with map insert if making multithread version
-    //
-
-    // Set event manager. Must be after setting sEluna
-    // on multithread have a map of state pointers and here insert this pointer to the map and then save a pointer of that pointer to the EventMgr
-    eventMgr = new EventMgr(&Eluna::GEluna);
 }
 
-Eluna::~Eluna()
+void Eluna::CreateBindStores()
 {
-    OnLuaStateClose();
+    DestroyBindStores();
 
-    delete eventMgr;
-    eventMgr = NULL;
+    ServerEventBindings = new EventBind<Hooks::ServerEvents>("ServerEvents", *this);
+    PlayerEventBindings = new EventBind<Hooks::PlayerEvents>("PlayerEvents", *this);
+    GuildEventBindings = new EventBind<Hooks::GuildEvents>("GuildEvents", *this);
+    GroupEventBindings = new EventBind<Hooks::GroupEvents>("GroupEvents", *this);
+    VehicleEventBindings = new EventBind<Hooks::VehicleEvents>("VehicleEvents", *this);
+    BGEventBindings = new EventBind<Hooks::BGEvents>("BGEvents", *this);
 
-    // Replace this with map remove if making multithread version
-    //
+    PacketEventBindings = new EntryBind<Hooks::PacketEvents>("PacketEvents", *this);
+    CreatureEventBindings = new EntryBind<Hooks::CreatureEvents>("CreatureEvents", *this);
+    CreatureGossipBindings = new EntryBind<Hooks::GossipEvents>("GossipEvents (creature)", *this);
+    GameObjectEventBindings = new EntryBind<Hooks::GameObjectEvents>("GameObjectEvents", *this);
+    GameObjectGossipBindings = new EntryBind<Hooks::GossipEvents>("GossipEvents (gameobject)", *this);
+    ItemEventBindings = new EntryBind<Hooks::ItemEvents>("ItemEvents", *this);
+    ItemGossipBindings = new EntryBind<Hooks::GossipEvents>("GossipEvents (item)", *this);
+    playerGossipBindings = new EntryBind<Hooks::GossipEvents>("GossipEvents (player)", *this);
 
+    CreatureUniqueBindings = new UniqueBind<Hooks::CreatureEvents>("CreatureEvents (unique)", *this);
+}
+
+void Eluna::DestroyBindStores()
+{
     delete ServerEventBindings;
     delete PlayerEventBindings;
     delete GuildEventBindings;
@@ -198,6 +264,8 @@ Eluna::~Eluna()
     delete ItemGossipBindings;
     delete playerGossipBindings;
     delete BGEventBindings;
+
+    delete CreatureUniqueBindings;
 
     ServerEventBindings = NULL;
     PlayerEventBindings = NULL;
@@ -215,8 +283,7 @@ Eluna::~Eluna()
     playerGossipBindings = NULL;
     BGEventBindings = NULL;
 
-    // Must close lua state after deleting stores and mgr
-    lua_close(L);
+    CreatureUniqueBindings = NULL;
 }
 
 void Eluna::AddScriptPath(std::string filename, const std::string& fullpath)
@@ -349,11 +416,15 @@ void Eluna::GetScripts(std::string path)
 
 static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second)
 {
-    return first.filepath.compare(second.filepath) < 0;
+    return first.filepath < second.filepath;
 }
 
 void Eluna::RunScripts()
 {
+    LOCK_ELUNA;
+    if (!IsEnabled())
+        return;
+
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     uint32 count = 0;
 
@@ -366,7 +437,9 @@ void Eluna::RunScripts()
     UNORDERED_MAP<std::string, std::string> loaded; // filename, path
 
     lua_getglobal(L, "package");
+    // Stack: package
     luaL_getsubtable(L, -1, "loaded");
+    // Stack: package, modules
     int modules = lua_gettop(L);
     for (ScriptList::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
     {
@@ -379,6 +452,7 @@ void Eluna::RunScripts()
         loaded[it->filename] = it->filepath;
 
         lua_getfield(L, modules, it->filename.c_str());
+        // Stack: package, modules, module
         if (!lua_isnoneornil(L, -1))
         {
             lua_pop(L, 1);
@@ -386,25 +460,38 @@ void Eluna::RunScripts()
             continue;
         }
         lua_pop(L, 1);
-        if (!luaL_loadfile(L, it->filepath.c_str()) && !lua_pcall(L, 0, 1, 0))
+        // Stack: package, modules
+
+        if (luaL_loadfile(L, it->filepath.c_str()))
         {
+            // Stack: package, modules, errmsg
+            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
+            Report(L);
+            // Stack: package, modules
+            continue;
+        }
+        // Stack: package, modules, filefunc
+
+        if (ExecuteCall(0, 1))
+        {
+            // Stack: package, modules, result
             if (lua_isnoneornil(L, -1) || (lua_isboolean(L, -1) && !lua_toboolean(L, -1)))
             {
+                // if result evaluates to false, change it to true
                 lua_pop(L, 1);
                 Push(L, true);
             }
             lua_setfield(L, modules, it->filename.c_str());
+            // Stack: package, modules
 
             // successfully loaded and ran file
             ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
             ++count;
             continue;
         }
-        ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
-        report(L);
     }
+    // Stack: package, modules
     lua_pop(L, 2);
-
     ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
 
     OnLuaStateOpen();
@@ -425,41 +512,98 @@ void Eluna::InvalidateObjects()
     lua_pop(L, 1);
 }
 
-void Eluna::report(lua_State* luastate)
+void Eluna::Report(lua_State* _L)
 {
-    const char* msg = lua_tostring(luastate, -1);
+    const char* msg = lua_tostring(_L, -1);
     ELUNA_LOG_ERROR("%s", msg);
-    lua_pop(luastate, 1);
+    lua_pop(_L, 1);
 }
 
-void Eluna::ExecuteCall(int params, int res)
+// Borrowed from http://stackoverflow.com/questions/12256455/print-stacktrace-from-c-code-with-embedded-lua
+int Eluna::StackTrace(lua_State *_L)
+{
+    // Stack: errmsg
+    if (!lua_isstring(_L, -1))  /* 'message' not a string? */
+        return 1;  /* keep it intact */
+    // Stack: errmsg, debug
+    lua_getglobal(_L, "debug");
+    if (!lua_istable(_L, -1))
+    {
+        lua_pop(_L, 1);
+        return 1;
+    }
+    // Stack: errmsg, debug, traceback
+    lua_getfield(_L, -1, "traceback");
+    if (!lua_isfunction(_L, -1))
+    {
+        lua_pop(_L, 2);
+        return 1;
+    }
+    lua_pushvalue(_L, -3);  /* pass error message */
+    lua_pushinteger(_L, 1);  /* skip this function and traceback */
+    // Stack: errmsg, debug, traceback, errmsg, 2
+    lua_call(_L, 2, 1);  /* call debug.traceback */
+
+    // dirty stack?
+    // Stack: errmsg, debug, tracemsg
+    return 1;
+}
+
+bool Eluna::ExecuteCall(int params, int res)
 {
     int top = lua_gettop(L);
+    int base = top - params;
 
     // Expected: function, [parameters]
-    ASSERT(top > params);
+    ASSERT(base > 0);
 
     // Check function type
-    int type = lua_type(L, top - params);
-    if (type != LUA_TFUNCTION)
+    if (!lua_isfunction(L, base))
     {
-        ELUNA_LOG_ERROR("[Eluna]: Cannot execute call: registered value is %s, not a function.", lua_typename(L, type));
-        ASSERT(false);
+        ELUNA_LOG_ERROR("[Eluna]: Cannot execute call: registered value is %s, not a function.", luaL_tolstring(L, base, NULL));
+        ASSERT(false); // stack probably corrupt
     }
 
-    // Objects are invalidated when event level hits 0
+    bool usetrace = eConfigMgr->GetBoolDefault("Eluna.TraceBack", false);
+    if (usetrace)
+    {
+        lua_pushcfunction(L, &StackTrace);
+        // Stack: function, [parameters], traceback
+        lua_insert(L, base);
+        // Stack: traceback, function, [parameters]
+    }
+
+    // Objects are invalidated when event_level hits 0
     ++event_level;
-    int result = lua_pcall(L, params, res, 0);
+    int result = lua_pcall(L, params, res, usetrace ? base : 0);
     --event_level;
 
+    if (usetrace)
+    {
+        // Stack: traceback, [results or errmsg]
+        lua_remove(L, base);
+    }
+    // Stack: [results or errmsg]
+
     // lua_pcall returns 0 on success.
-    // On error we report errors and push nils for expected amount of returned values
+    // On error print the error and push nils for expected amount of returned values
     if (result)
     {
-        report(L);
+        // Stack: errmsg
+        Report(L);
+
+        // Force garbage collect
+        lua_gc(L, LUA_GCCOLLECT, 0);
+
+        // Push nils for expected amount of results
         for (int i = 0; i < res; ++i)
             lua_pushnil(L);
+        // Stack: [nils]
+        return false;
     }
+
+    // Stack: [results]
+    return true;
 }
 
 void Eluna::Push(lua_State* luastate)
@@ -767,56 +911,56 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
 {
     switch (regtype)
     {
-        case HookMgr::REGTYPE_SERVER:
-            if (evt < HookMgr::SERVER_EVENT_COUNT)
+        case Hooks::REGTYPE_SERVER:
+            if (evt < Hooks::SERVER_EVENT_COUNT)
             {
                 ServerEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_PLAYER:
-            if (evt < HookMgr::PLAYER_EVENT_COUNT)
+        case Hooks::REGTYPE_PLAYER:
+            if (evt < Hooks::PLAYER_EVENT_COUNT)
             {
                 PlayerEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_GUILD:
-            if (evt < HookMgr::GUILD_EVENT_COUNT)
+        case Hooks::REGTYPE_GUILD:
+            if (evt < Hooks::GUILD_EVENT_COUNT)
             {
                 GuildEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_GROUP:
-            if (evt < HookMgr::GROUP_EVENT_COUNT)
+        case Hooks::REGTYPE_GROUP:
+            if (evt < Hooks::GROUP_EVENT_COUNT)
             {
                 GroupEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_VEHICLE:
-            if (evt < HookMgr::VEHICLE_EVENT_COUNT)
+        case Hooks::REGTYPE_VEHICLE:
+            if (evt < Hooks::VEHICLE_EVENT_COUNT)
             {
                 VehicleEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_BG:
-            if (evt < HookMgr::BG_EVENT_COUNT)
+        case Hooks::REGTYPE_BG:
+            if (evt < Hooks::BG_EVENT_COUNT)
             {
                 BGEventBindings->Insert(evt, functionRef, shots);
                 return;
             }
             break;
 
-        case HookMgr::REGTYPE_PACKET:
-            if (evt < HookMgr::PACKET_EVENT_COUNT)
+        case Hooks::REGTYPE_PACKET:
+            if (evt < Hooks::PACKET_EVENT_COUNT)
             {
                 if (id >= NUM_MSG_TYPES)
                 {
@@ -830,8 +974,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_CREATURE:
-            if (evt < HookMgr::CREATURE_EVENT_COUNT)
+        case Hooks::REGTYPE_CREATURE:
+            if (evt < Hooks::CREATURE_EVENT_COUNT)
             {
                 if (id != 0)
                 {
@@ -853,8 +997,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_CREATURE_GOSSIP:
-            if (evt < HookMgr::GOSSIP_EVENT_COUNT)
+        case Hooks::REGTYPE_CREATURE_GOSSIP:
+            if (evt < Hooks::GOSSIP_EVENT_COUNT)
             {
                 if (!eObjectMgr->GetCreatureTemplate(id))
                 {
@@ -868,8 +1012,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_GAMEOBJECT:
-            if (evt < HookMgr::GAMEOBJECT_EVENT_COUNT)
+        case Hooks::REGTYPE_GAMEOBJECT:
+            if (evt < Hooks::GAMEOBJECT_EVENT_COUNT)
             {
                 if (!eObjectMgr->GetGameObjectTemplate(id))
                 {
@@ -883,8 +1027,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_GAMEOBJECT_GOSSIP:
-            if (evt < HookMgr::GOSSIP_EVENT_COUNT)
+        case Hooks::REGTYPE_GAMEOBJECT_GOSSIP:
+            if (evt < Hooks::GOSSIP_EVENT_COUNT)
             {
                 if (!eObjectMgr->GetGameObjectTemplate(id))
                 {
@@ -898,8 +1042,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_ITEM:
-            if (evt < HookMgr::ITEM_EVENT_COUNT)
+        case Hooks::REGTYPE_ITEM:
+            if (evt < Hooks::ITEM_EVENT_COUNT)
             {
                 if (!eObjectMgr->GetItemTemplate(id))
                 {
@@ -913,8 +1057,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_ITEM_GOSSIP:
-            if (evt < HookMgr::GOSSIP_EVENT_COUNT)
+        case Hooks::REGTYPE_ITEM_GOSSIP:
+            if (evt < Hooks::GOSSIP_EVENT_COUNT)
             {
                 if (!eObjectMgr->GetItemTemplate(id))
                 {
@@ -928,8 +1072,8 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
             }
             break;
 
-        case HookMgr::REGTYPE_PLAYER_GOSSIP:
-            if (evt < HookMgr::GOSSIP_EVENT_COUNT)
+        case Hooks::REGTYPE_PLAYER_GOSSIP:
+            if (evt < Hooks::GOSSIP_EVENT_COUNT)
             {
                 playerGossipBindings->Insert(id, evt, functionRef, shots);
                 return;
@@ -938,4 +1082,57 @@ void Eluna::Register(uint8 regtype, uint32 id, uint64 guid, uint32 instanceId, u
     }
     luaL_unref(L, LUA_REGISTRYINDEX, functionRef);
     luaL_error(L, "Unknown event type (regtype %d, id %d, event %d)", regtype, id, evt);
+}
+
+/*
+ * Cleans up the stack, effectively undoing all Push calls and the Setup call.
+ */
+void Eluna::CleanUpStack(int number_of_arguments)
+{
+    // Stack: event_id, [arguments]
+
+    lua_pop(L, number_of_arguments + 1); // Add 1 because the caller doesn't know about `event_id`.
+    // Stack: (empty)
+
+    if (event_level == 0)
+        InvalidateObjects();
+}
+
+/*
+ * Call a single event handler that was put on the stack with `Setup` and removes it from the stack.
+ *
+ * The caller is responsible for keeping track of how many times this should be called.
+ */
+int Eluna::CallOneFunction(int number_of_functions, int number_of_arguments, int number_of_results)
+{
+    ++number_of_arguments; // Caller doesn't know about `event_id`.
+    ASSERT(number_of_functions > 0 && number_of_arguments > 0 && number_of_results >= 0);
+    // Stack: event_id, [arguments], [functions]
+
+    int functions_top        = lua_gettop(L);
+    int first_function_index = functions_top - number_of_functions + 1;
+    int arguments_top        = first_function_index - 1;
+    int first_argument_index = arguments_top - number_of_arguments + 1;
+
+    // Copy the arguments from the bottom of the stack to the top.
+    for (int argument_index = first_argument_index; argument_index <= arguments_top; ++argument_index)
+    {
+        lua_pushvalue(L, argument_index);
+    }
+    // Stack: event_id, [arguments], [functions], event_id, [arguments]
+
+    ExecuteCall(number_of_arguments, number_of_results);
+    --functions_top;
+    // Stack: event_id, [arguments], [functions - 1], [results]
+
+    return functions_top + 1; // Return the location of the first result (if any exist).
+}
+
+CreatureAI* Eluna::GetAI(Creature* creature)
+{
+    if (CreatureEventBindings->HasEvents(creature->GetEntry()) ||
+        CreatureUniqueBindings->HasEvents(creature->GET_GUID(), creature->GetInstanceId()))
+        return new ElunaCreatureAI(creature);
+
+    return NULL;
 }
