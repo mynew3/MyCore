@@ -1734,15 +1734,8 @@ void Aura::HandleAuraSpecificPeriodics(AuraApplication const* aurApp, Unit* cast
             {
                 AuraEffect* aurEff = GetEffect(i);
 
-                // ignore non positive values (can be result apply spellmods to aura damage
-                uint32 damage = std::max(aurEff->GetAmount(), 0);
-
-                // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-                sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
-
-                aurEff->SetDonePct(caster->SpellHealingPctDone(target, m_spellInfo)); // Calculate done percentage first!
-                damage = target->CountPctFromMaxHealth(damage) * aurEff->GetDonePct();
-                aurEff->SetDamage(caster->SpellHealingBonusDone(target, m_spellInfo, damage, DOT, GetStackAmount()));
+                aurEff->SetDonePct(caster->SpellHealingPctDone(target, m_spellInfo));
+                aurEff->SetBonusAmount(caster->SpellHealingBonusDone(target, m_spellInfo, 0, DOT, GetStackAmount()));
                 aurEff->SetCritChance(caster->GetUnitSpellCriticalChance(target, m_spellInfo, m_spellInfo->GetSchoolMask()));
                 break;
             }
