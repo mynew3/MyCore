@@ -411,7 +411,9 @@ class spell_warl_everlasting_affliction : public SpellScriptLoader
                     // Refresh corruption on target
                     if (AuraEffect* aur = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, caster->GetGUID()))
                     {
-                        aur->SetBonusAmount(caster->SpellDamageBonusDone(target, aur->GetSpellInfo(), 0, DOT));
+                        uint32 damage = std::max(aur->GetAmount(), 0);
+                        sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+                        aur->SetDamage(caster->SpellDamageBonusDone(target, aur->GetSpellInfo(), damage, DOT) * aur->GetDonePct());
                         aur->CalculatePeriodic(caster, false, false);
                         aur->GetBase()->RefreshDuration(true);
                     }
