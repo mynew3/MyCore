@@ -167,8 +167,6 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
     {
         ArenaTeam* Team = sArenaTeamMgr->GetArenaTeamById(arenateamid);
         if (Team)
-            Team = sArenaTeamMgr->GetArenaTeamById(0);
-        if (Team)
             sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, Team->GetName().c_str(), ginfo->ArenaType, ginfo->ArenaType);
     }
 
