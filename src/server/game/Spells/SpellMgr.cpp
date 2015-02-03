@@ -2959,6 +2959,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         switch (spellInfo->Id)
         {
             case 53096: // Quetz'lun's Judgment
+            case 70743: // AoD Special
+            case 70614: // AoD Special - Vegard
                 spellInfo->MaxAffectedTargets = 1;
                 break;
             case 42436: // Drink! (Brewfest)
@@ -3788,7 +3790,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 45440: // Steam Tonk Controller
             case 60256: // Collect Sample
                 // Crashes client on pressing ESC
-                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
                 break;
             case 24259: // Spell Lock
                 spellInfo->Speed = 80.0f;
