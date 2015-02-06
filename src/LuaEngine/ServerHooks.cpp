@@ -82,50 +82,43 @@ void Eluna::OnChange(Weather* weather, uint32 zone, WeatherState state, float gr
 }
 
 // Auction House
-void Eluna::OnAdd(AuctionHouseEntry const* auctionHouseEntry, Player* pPlayer, Item* pItem, uint32 bid, uint32 buyout, uint32 etime)
+void Eluna::OnAdd(AuctionHouseObject* ah)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_ADD))
         return;
 
     LOCK_ELUNA;
-    Push(auctionHouseEntry);
-    Push(pPlayer);
-    Push(pItem);
-    Push(bid);
-    Push(buyout);
-    Push(etime);
+    Push(ah);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_ADD);
 }
 
-void Eluna::OnRemove(AuctionHouseEntry const* auctionHouseEntry, Player* pPlayer, Item* pItem)
+void Eluna::OnRemove(AuctionHouseObject* ah)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_REMOVE))
         return;
 
     LOCK_ELUNA;
-    Push(auctionHouseEntry);
-    Push(pPlayer);
-    Push(pItem);
+    Push(ah);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_REMOVE);
 }
 
-void Eluna::OnSuccessful(AuctionHouseEntry const* auctionHouseEntry)
+void Eluna::OnSuccessful(AuctionHouseObject* ah)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_SUCCESSFUL))
         return;
 
     LOCK_ELUNA;
-    Push(auctionHouseEntry);
+    Push(ah);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_SUCCESSFUL);
 }
 
-void Eluna::OnExpire(AuctionHouseEntry const* auctionHouseEntry)
+void Eluna::OnExpire(AuctionHouseObject* ah)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_EXPIRE))
         return;
 
     LOCK_ELUNA;
-    Push(auctionHouseEntry);
+    Push(ah);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_EXPIRE);
 }
 
