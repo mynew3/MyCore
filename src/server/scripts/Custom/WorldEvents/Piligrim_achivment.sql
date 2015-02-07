@@ -78,15 +78,15 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 -- Achievement: "FOOD FIGHT!"
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (11168,11178,11179,11180,11181);
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
-(11168, 11, 0, 0, 'achievement_food_fight'),
+(11168, 11, 0, 0, 'EC_achievement_food_fight'),
 (11168, 16, 404, 0, ''),
-(11178, 11, 0, 0, 'achievement_food_fight'),
+(11178, 11, 0, 0, 'EC_achievement_food_fight'),
 (11178, 16, 404, 0, ''),
-(11179, 11, 0, 0, 'achievement_food_fight'),
+(11179, 11, 0, 0, 'EC_achievement_food_fight'),
 (11179, 16, 404, 0, ''),
-(11180, 11, 0, 0, 'achievement_food_fight'),
+(11180, 11, 0, 0, 'EC_achievement_food_fight'),
 (11180, 16, 404, 0, ''),
-(11181, 11, 0, 0, 'achievement_food_fight'),
+(11181, 11, 0, 0, 'EC_achievement_food_fight'),
 (11181, 16, 404, 0, '');
 
 -- Achievement: Sharing is Caring
