@@ -336,19 +336,19 @@ struct BerserkSelector
     }
 };
 
-class TW_boss_thorim : public CreatureScript
+class EC_boss_thorim : public CreatureScript
 {
 public:
-    TW_boss_thorim() : CreatureScript("TW_boss_thorim") { }
+    EC_boss_thorim() : CreatureScript("EC_boss_thorim") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new TW_boss_thorimAI(creature);
+        return new EC_boss_thorimAI(creature);
     }
 
-    struct TW_boss_thorimAI : public BossAI
+    struct EC_boss_thorimAI : public BossAI
     {
-        TW_boss_thorimAI(Creature* creature) : BossAI(creature, BOSS_THORIM)
+        EC_boss_thorimAI(Creature* creature) : BossAI(creature, BOSS_THORIM)
         {
             homePosition = creature->GetHomePosition();
             EncounterFinished = false;
@@ -783,19 +783,19 @@ public:
 };
 
 
-class TW_npc_thorim_pre_phase : public CreatureScript
+class EC_npc_thorim_pre_phase : public CreatureScript
 {
 public:
-    TW_npc_thorim_pre_phase() : CreatureScript("TW_npc_thorim_pre_phase") { }
+    EC_npc_thorim_pre_phase() : CreatureScript("EC_npc_thorim_pre_phase") { }
 
     CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new TW_npc_thorim_pre_phaseAI (pCreature);
+        return new EC_npc_thorim_pre_phaseAI (pCreature);
     }
 
-    struct TW_npc_thorim_pre_phaseAI : public ScriptedAI
+    struct EC_npc_thorim_pre_phaseAI : public ScriptedAI
     {
-        TW_npc_thorim_pre_phaseAI(Creature *pCreature) : ScriptedAI(pCreature)
+        EC_npc_thorim_pre_phaseAI(Creature *pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
             me->setFaction(14);
@@ -877,14 +877,14 @@ public:
     };
 };
 
-class TW_npc_thorim_arena_phase : public CreatureScript
+class EC_npc_thorim_arena_phase : public CreatureScript
 {
     public:
-        TW_npc_thorim_arena_phase() : CreatureScript("TW_npc_thorim_arena_phase") { }
+        EC_npc_thorim_arena_phase() : CreatureScript("EC_npc_thorim_arena_phase") { }
 
-        struct TW_npc_thorim_arena_phaseAI : public ScriptedAI
+        struct EC_npc_thorim_arena_phaseAI : public ScriptedAI
         {
-            TW_npc_thorim_arena_phaseAI(Creature* creature) : ScriptedAI(creature)
+            EC_npc_thorim_arena_phaseAI(Creature* creature) : ScriptedAI(creature)
             {
                 _instance = creature->GetInstanceScript();
                 me->setFaction(14);
@@ -1013,18 +1013,18 @@ class TW_npc_thorim_arena_phase : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new TW_npc_thorim_arena_phaseAI(creature);
+            return new EC_npc_thorim_arena_phaseAI(creature);
         }
 };
 
-class TW_npc_runic_colossus : public CreatureScript
+class EC_npc_runic_colossus : public CreatureScript
 {
     public:
-        TW_npc_runic_colossus() : CreatureScript("TW_npc_runic_colossus") { }
+        EC_npc_runic_colossus() : CreatureScript("EC_npc_runic_colossus") { }
 
-        struct TW_npc_runic_colossusAI : public ScriptedAI
+        struct EC_npc_runic_colossusAI : public ScriptedAI
         {
-            TW_npc_runic_colossusAI(Creature* creature) : ScriptedAI(creature), summons(me)
+            EC_npc_runic_colossusAI(Creature* creature) : ScriptedAI(creature), summons(me)
             {
                 instance = creature->GetInstanceScript();
                 //SetImmuneToPushPullEffects(true);
@@ -1165,18 +1165,18 @@ class TW_npc_runic_colossus : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new TW_npc_runic_colossusAI(creature);
+            return new EC_npc_runic_colossusAI(creature);
         }
 };
 
-class TW_npc_runic_smash : public CreatureScript
+class EC_npc_runic_smash : public CreatureScript
 {
     public:
-        TW_npc_runic_smash() : CreatureScript("TW_npc_runic_smash") { }
+        EC_npc_runic_smash() : CreatureScript("EC_npc_runic_smash") { }
 
-        struct TW_npc_runic_smashAI : public ScriptedAI
+        struct EC_npc_runic_smashAI : public ScriptedAI
         {
-            TW_npc_runic_smashAI(Creature* creature) : ScriptedAI(creature)
+            EC_npc_runic_smashAI(Creature* creature) : ScriptedAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->SetDisplayId(16925);
@@ -1206,23 +1206,23 @@ class TW_npc_runic_smash : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new TW_npc_runic_smashAI(creature);
+            return new EC_npc_runic_smashAI(creature);
         }
 };
 
-class TW_npc_ancient_rune_giant : public CreatureScript
+class EC_npc_ancient_rune_giant : public CreatureScript
 {
 public:
-    TW_npc_ancient_rune_giant() : CreatureScript("TW_npc_ancient_rune_giant") { }
+    EC_npc_ancient_rune_giant() : CreatureScript("EC_npc_ancient_rune_giant") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new TW_npc_ancient_rune_giantAI(creature);
+        return new EC_npc_ancient_rune_giantAI(creature);
     }
 
-    struct TW_npc_ancient_rune_giantAI : public ScriptedAI
+    struct EC_npc_ancient_rune_giantAI : public ScriptedAI
     {
-        TW_npc_ancient_rune_giantAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        EC_npc_ancient_rune_giantAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
             //SetImmuneToPushPullEffects(true);
@@ -1302,19 +1302,19 @@ public:
     };
 };
 
-class TW_npc_sif : public CreatureScript
+class EC_npc_sif : public CreatureScript
 {
 public:
-    TW_npc_sif() : CreatureScript("TW_npc_sif") { }
+    EC_npc_sif() : CreatureScript("EC_npc_sif") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new TW_npc_sifAI(creature);
+        return new EC_npc_sifAI(creature);
     }
 
-    struct TW_npc_sifAI : public ScriptedAI
+    struct EC_npc_sifAI : public ScriptedAI
     {
-        TW_npc_sifAI(Creature* creature) : ScriptedAI(creature)
+        EC_npc_sifAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             instance = me->GetInstanceScript();
@@ -1377,19 +1377,19 @@ public:
     };
 };
 
-class TW_thorim_trap_bunny : public CreatureScript
+class EC_thorim_trap_bunny : public CreatureScript
 {
 public:
-    TW_thorim_trap_bunny() : CreatureScript("TW_thorim_trap_bunny") { }
+    EC_thorim_trap_bunny() : CreatureScript("EC_thorim_trap_bunny") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new TW_thorim_trap_bunnyAI(creature);
+        return new EC_thorim_trap_bunnyAI(creature);
     }
 
-    struct TW_thorim_trap_bunnyAI : public ScriptedAI
+    struct EC_thorim_trap_bunnyAI : public ScriptedAI
     {
-        TW_thorim_trap_bunnyAI(Creature* creature) : ScriptedAI(creature)
+        EC_thorim_trap_bunnyAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitState(UNIT_STATE_ROOT);
@@ -1432,14 +1432,14 @@ class NotInArenaCheck
         }
 };
 
-class TW_spell_stormhammer_targeting : public SpellScriptLoader
+class EC_spell_stormhammer_targeting : public SpellScriptLoader
 {
     public:
-        TW_spell_stormhammer_targeting() : SpellScriptLoader("TW_spell_stormhammer_targeting") { }
+        EC_spell_stormhammer_targeting() : SpellScriptLoader("EC_spell_stormhammer_targeting") { }
 
-        class TW_spell_stormhammer_targeting_SpellScript : public SpellScript
+        class EC_spell_stormhammer_targeting_SpellScript : public SpellScript
         {
-            PrepareSpellScript(TW_spell_stormhammer_targeting_SpellScript);
+            PrepareSpellScript(EC_spell_stormhammer_targeting_SpellScript);
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
@@ -1463,9 +1463,9 @@ class TW_spell_stormhammer_targeting : public SpellScriptLoader
 
             void Register() override
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_stormhammer_targeting_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_stormhammer_targeting_SpellScript::SetTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_stormhammer_targeting_SpellScript::SetTarget, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_stormhammer_targeting_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_stormhammer_targeting_SpellScript::SetTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_stormhammer_targeting_SpellScript::SetTarget, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
             }
 
             WorldObject* _target;
@@ -1473,14 +1473,14 @@ class TW_spell_stormhammer_targeting : public SpellScriptLoader
 
         SpellScript* GetSpellScript() const
         {
-            return new TW_spell_stormhammer_targeting_SpellScript();
+            return new EC_spell_stormhammer_targeting_SpellScript();
         }
 };
 
-class TW_go_thorim_lever : public GameObjectScript
+class EC_go_thorim_lever : public GameObjectScript
 {
     public:
-       TW_go_thorim_lever() : GameObjectScript("TW_go_thorim_lever") { }
+       EC_go_thorim_lever() : GameObjectScript("EC_go_thorim_lever") { }
 
        bool OnGossipHello(Player* /*player*/, GameObject* go) override
        {
@@ -1497,14 +1497,14 @@ class TW_go_thorim_lever : public GameObjectScript
        }
 };
 
-class TW_spell_thorim_berserk : public SpellScriptLoader
+class EC_spell_thorim_berserk : public SpellScriptLoader
 {
     public:
-        TW_spell_thorim_berserk() : SpellScriptLoader("TW_spell_thorim_berserk") {}
+        EC_spell_thorim_berserk() : SpellScriptLoader("EC_spell_thorim_berserk") {}
 
-        class TW_spell_thorim_berserk_SpellScript : public SpellScript
+        class EC_spell_thorim_berserk_SpellScript : public SpellScript
         {
-            PrepareSpellScript(TW_spell_thorim_berserk_SpellScript);
+            PrepareSpellScript(EC_spell_thorim_berserk_SpellScript);
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
@@ -1513,8 +1513,8 @@ class TW_spell_thorim_berserk : public SpellScriptLoader
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_thorim_berserk_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_thorim_berserk_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_thorim_berserk_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_thorim_berserk_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENTRY);
             }
 
             private:
@@ -1523,18 +1523,18 @@ class TW_spell_thorim_berserk : public SpellScriptLoader
 
         SpellScript* GetSpellScript() const
         {
-            return new TW_spell_thorim_berserk_SpellScript();
+            return new EC_spell_thorim_berserk_SpellScript();
         }
 };
 
-class TW_spell_thorim_runic_fortification : public SpellScriptLoader
+class EC_spell_thorim_runic_fortification : public SpellScriptLoader
 {
     public:
-        TW_spell_thorim_runic_fortification() : SpellScriptLoader("TW_spell_thorim_runic_fortification") { }
+        EC_spell_thorim_runic_fortification() : SpellScriptLoader("EC_spell_thorim_runic_fortification") { }
 
-        class TW_spell_thorim_runic_fortification_SpellScript : public SpellScript
+        class EC_spell_thorim_runic_fortification_SpellScript : public SpellScript
         {
-            PrepareSpellScript(TW_spell_thorim_runic_fortification_SpellScript);
+            PrepareSpellScript(EC_spell_thorim_runic_fortification_SpellScript);
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
@@ -1543,22 +1543,22 @@ class TW_spell_thorim_runic_fortification : public SpellScriptLoader
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(TW_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(EC_spell_thorim_runic_fortification_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENTRY);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new TW_spell_thorim_runic_fortification_SpellScript();
+            return new EC_spell_thorim_runic_fortification_SpellScript();
         }
 };
 
-class TW_achievement_siffed_and_lose_your_illusion : public AchievementCriteriaScript
+class EC_achievement_siffed_and_lose_your_illusion : public AchievementCriteriaScript
 {
     public:
-        TW_achievement_siffed_and_lose_your_illusion() : AchievementCriteriaScript("TW_achievement_siffed_and_lose_your_illusion")
+        EC_achievement_siffed_and_lose_your_illusion() : AchievementCriteriaScript("EC_achievement_siffed_and_lose_your_illusion")
         {
         }
 
@@ -1575,10 +1575,10 @@ class TW_achievement_siffed_and_lose_your_illusion : public AchievementCriteriaS
         }
 };
 
-class TW_achievement_dont_stand_in_the_lightning : public AchievementCriteriaScript
+class EC_achievement_dont_stand_in_the_lightning : public AchievementCriteriaScript
 {
     public:
-        TW_achievement_dont_stand_in_the_lightning() : AchievementCriteriaScript("TW_achievement_dont_stand_in_the_lightning")
+        EC_achievement_dont_stand_in_the_lightning() : AchievementCriteriaScript("EC_achievement_dont_stand_in_the_lightning")
         {
         }
 
@@ -1595,21 +1595,21 @@ class TW_achievement_dont_stand_in_the_lightning : public AchievementCriteriaScr
         }
 };
 
-void AddSC_TW_boss_thorim()
+void AddSC_EC_boss_thorim()
 {
-    new TW_boss_thorim();
-    new TW_npc_thorim_pre_phase();
-    new TW_npc_thorim_arena_phase();
-    new TW_npc_runic_colossus();
-    new TW_npc_runic_smash();
-    new TW_npc_ancient_rune_giant();
-    new TW_npc_sif();
-    new TW_spell_stormhammer_targeting();
-    new TW_go_thorim_lever();
-    new TW_spell_thorim_berserk();
-    new TW_achievement_siffed_and_lose_your_illusion();
-    new TW_achievement_dont_stand_in_the_lightning();
-    new TW_spell_thorim_runic_fortification();
-    new TW_thorim_trap_bunny();
+    new EC_boss_thorim();
+    new EC_npc_thorim_pre_phase();
+    new EC_npc_thorim_arena_phase();
+    new EC_npc_runic_colossus();
+    new EC_npc_runic_smash();
+    new EC_npc_ancient_rune_giant();
+    new EC_npc_sif();
+    new EC_spell_stormhammer_targeting();
+    new EC_go_thorim_lever();
+    new EC_spell_thorim_berserk();
+    new EC_achievement_siffed_and_lose_your_illusion();
+    new EC_achievement_dont_stand_in_the_lightning();
+    new EC_spell_thorim_runic_fortification();
+    new EC_thorim_trap_bunny();
 }
 

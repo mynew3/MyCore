@@ -13,7 +13,7 @@
 set(scripts_STAT_SRCS
   Custom/custom.cpp
   Custom/custom_scripts.cpp
-  Custom/Ulduar/TW_boss_thorim.cpp
+  Custom/Ulduar/EC_boss_thorim.cpp
   Custom/TrialOfTheChampion/TW_boss_argent_challenge.cpp
   Custom/TrialOfTheChampion/TW_boss_black_knight.cpp
   Custom/TrialOfTheChampion/TW_boss_grand_champions.cpp
