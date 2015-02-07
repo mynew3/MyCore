@@ -374,25 +374,18 @@ public:
             if (EncounterFinished)
                 return;
 
-            _Reset();
-
             if (Wipe)
             {
+                instance->SetBossState(BOSS_THORIM, FAIL);
+                if (Creature* Sif = me->FindNearestCreature(NPC_SIF, 200.0f))
+                    Sif->DespawnOrUnsummon();
                 Talk(SAY_WIPE);
-
-                // Respawn Mini Bosses
-                for (uint8 i = DATA_RUNIC_COLOSSUS; i <= DATA_RUNE_GIANT; ++i)
-                    if (Creature* MiniBoss = ObjectAccessor::GetCreature(*me, instance->GetGuidData(i)))
-                        MiniBoss->Respawn(true);
             }
+
+            _Reset();
 
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
-
-            // Spawn PrePhase Adds
-            for (uint8 i = 0; i < 6; ++i)
-                me->SummonCreature(preAddLocations[i].entry, preAddLocations[i].x, preAddLocations[i].y, preAddLocations[i].z, preAddLocations[i].o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-
 
             phase = PHASE_NULL;
             HardMode = false;
@@ -404,6 +397,20 @@ public:
             _checkTargetTimer = 7000;
             PreAddsCount = 0;
 
+            if (Creature* Sif = ObjectAccessor::GetCreature(*me, SifGUID))
+                Sif->DespawnOrUnsummon();
+            SifGUID.Clear();
+
+            // Respawn Mini Bosses
+            for (uint8 i = DATA_RUNIC_COLOSSUS; i <= DATA_RUNE_GIANT; ++i)
+                if (Creature* MiniBoss = ObjectAccessor::GetCreature(*me, instance->GetGuidData(i)))
+                    MiniBoss->Respawn(true);
+
+            // Spawn Pre-Phase Adds
+            for (uint8 i = 0; i < 6; ++i)
+                me->SummonCreature(preAddLocations[i].entry,preAddLocations[i].x, preAddLocations[i].y, preAddLocations[i].z, preAddLocations[i].o,
+                TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+
             if (GameObject* go = me->FindNearestGameObject(GO_LEVER, 500))
                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
@@ -412,11 +419,6 @@ public:
         {
             if (EncounterFinished)
                 return;
-
-            // If weird things happen even after this...
-            me->RemoveAllAuras();
-            me->getThreatManager().clearReferences();
-            me->CombatStop();
 
             phase = PHASE_OUTRO;
             EncounterFinished = true;
@@ -447,7 +449,6 @@ public:
             switch (summon->GetEntry())
             {
                 case NPC_CHARGED_ORB:
-                    summon->AddUnitState(UNIT_STATE_ROOT); // bah
                     summon->SetReactState(REACT_PASSIVE);
                     summon->SetFlag(UNIT_FIELD_FLAGS, 33685508); // Magic number intentional.
                     break;
@@ -1043,7 +1044,7 @@ class TW_npc_runic_colossus : public CreatureScript
                 me->GetMotionMaster()->MoveTargetedHome();
 
                 // Runed Door closed
-                if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_RUNIC_DOOR, 200.0f))
+                if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_RUNIC_DOOR, 20.0f))
                     gate->SetGoState(GO_STATE_READY);
 
                 // Spawn trashes
@@ -1066,7 +1067,7 @@ class TW_npc_runic_colossus : public CreatureScript
 
             void JustDied(Unit* /*victim*/) override
             {
-                if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_RUNIC_DOOR, 200.0f))
+                if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_RUNIC_DOOR, 20.0f))
                     gate->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1075,7 +1076,7 @@ class TW_npc_runic_colossus : public CreatureScript
                 switch (action)
                 {
                     case ACTION_RUNIC_SMASH:
-                        //RunicSmashPhase = 1;
+                        RunicSmashPhase = 1;
                         break;
                 }
             }
@@ -1095,7 +1096,6 @@ class TW_npc_runic_colossus : public CreatureScript
             {
                 RunicSmashPhase = 0;
                 me->InterruptNonMeleeSpells(true);
-                summons.DespawnEntry(NPC_GOLEM_BUNNY);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
@@ -1243,7 +1243,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             // Stone Door closed
-            if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_STONE_DOOR, 200.0f))
+            if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_STONE_DOOR, 20.0f))
                 gate->SetGoState(GO_STATE_READY);
 
             // Spawn trashes
@@ -1273,7 +1273,7 @@ public:
         void JustDied(Unit* /*victim*/) override
         {
             // Stone Door opened
-            if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_STONE_DOOR, 200.0f))
+            if (GameObject* gate = me->FindNearestGameObject(GO_THORIM_STONE_DOOR, 20.0f))
                 gate->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -1393,9 +1393,11 @@ public:
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitState(UNIT_STATE_ROOT);
+            instance = me->GetInstanceScript();
             HasStunAura = false;
         }
 
+        InstanceScript* instance;
         EventMap events;
         bool HasStunAura;
 
