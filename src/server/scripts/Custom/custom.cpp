@@ -8,7 +8,7 @@ void AddSC_TW_boss_black_knight();
 void AddSC_TW_boss_argent_challenge();
 void AddSC_TW_trial_of_the_champion();
 void AddSC_EC_boss_thorim();
-
+void AddSC_EC_boss_apothecary_trio();
 void AddSC_EC_pilgrim();
 
 /* This is where custom scripts should be added. */
@@ -23,4 +23,6 @@ void AddSC_custom()
     AddSC_TW_trial_of_the_champion();
     AddSC_EC_boss_thorim();
     AddSC_EC_pilgrim();
+	AddSC_EC_boss_apothecary_trio();
+ 
 }

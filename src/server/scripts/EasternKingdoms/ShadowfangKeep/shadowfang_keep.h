@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,7 +26,24 @@ enum DataTypes
     TYPE_FREE_NPC               = 1,
     TYPE_RETHILGORE             = 2,
     TYPE_FENRUS                 = 3,
-    TYPE_NANDOS                 = 4
+    TYPE_NANDOS                 = 4,
+    TYPE_CROWN                  = 5,
+    TYPE_BATTLE                 = 6
+};
+
+enum Creaturesapothecary
+{
+    NPC_FRYE                = 36272,
+    NPC_HUMMEL              = 36296,
+    NPC_BAXTER              = 36565
+};
+
+enum Data64
+{
+    DATA_DOOR,
+    DATA_FRYE,
+    DATA_HUMMEL,
+    DATA_BAXTER
 };
 
 #endif
