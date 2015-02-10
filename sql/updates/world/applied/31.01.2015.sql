@@ -1,15 +1,16 @@
 DELETE FROM `creature_text` WHERE `entry` IN(37158,37704);
 DELETE FROM `creature_text` WHERE `entry`=37225 AND `groupid` > 15;
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`, `BroadcastTextID`) VALUES
-(37158, 0, 0, '%s prepares to attack!', 41, 0, 100, 0, 0, 0, 'Quel''Delar', 37211),
-(37704, 0, 0, 'Quel''Delar leaps to life in the presence of Frostmourne!', 41, 0, 100, 0, 0, 0, 'Frostmourne Altar Bunny (Quel''Delar)', 37645),
+
+(37158, 0, 0, '%s готовится атаковать!', 41, 0, 100, 0, 0, 0, 'Quel''Delar', 37211),
+(37704, 0, 0, 'Кельделар возвращается к жизни в присутствии Ледяной Скорби!', 41, 0, 100, 0, 0, 0, 'Frostmourne Altar Bunny (Quel''Delar)', 37645),
 -- Uther
-(37225, 16, 0, 'Halt! Do not carry that blade any further!', 14, 0, 100, 25, 0, 16675, 'Uther the Lightbringer', 37201),
-(37225, 17, 0, 'Do you realize what you''ve done?', 14, 0, 100, 5, 0, 16676, 'Uther the Lightbringer', 37202),
-(37225, 18, 0, 'You have forged this blade from saronite, the very blood of an old god. The power of the Lich King calls to this weapon.', 12, 0, 100, 1, 0, 16677, 'Uther the Lightbringer', 37204),
-(37225, 19, 0, 'Each moment you tarry here, Quel''Delar drinks in the evil of this place.', 12, 0, 100, 1, 0, 16678, 'Uther the Lightbringer', 38442),
-(37225, 20, 0, 'There is only one way to cleanse this sword. Make haste for the Sunwell and immerse the blade in its waters.', 12, 0, 100, 25, 0, 16679, 'Uther the Lightbringer', 37205),
-(37225, 21, 0, 'I can resist Frostmourne''s call no more...', 12, 0, 100, 1, 0, 16680, 'Uther the Lightbringer', 37206);
+(37225, 16, 0, 'Стой! Не подходи к этоту клинку близко!', 14, 0, 100, 25, 0, 16675, 'Uther the Lightbringer', 37201),
+(37225, 17, 0, 'Вы понимаете, что вы наделали?', 14, 0, 100, 5, 0, 16676, 'Uther the Lightbringer', 37202),
+(37225, 18, 0, 'Вы подделали этот клинок из саронита, саму кровь старого бога. Король-Лич призывает это оружие!.', 12, 0, 100, 1, 0, 16677, 'Uther the Lightbringer', 37204),
+(37225, 19, 0, 'Каждый момент, пока вы находитесь здесь, Кельделар впитывает злость в себя.', 12, 0, 100, 1, 0, 16678, 'Uther the Lightbringer', 38442),
+(37225, 20, 0, 'Существует только один способ очистить этот меч. Поторопитесь в Плато Солнечного Колодца и погрузите нож в его воды!', 12, 0, 100, 25, 0, 16679, 'Uther the Lightbringer', 37205),
+(37225, 21, 0, 'Не могу сопротивляться зову Ледяной Скорбиии ...', 12, 0, 100, 1, 0, 16680, 'Uther the Lightbringer', 37206);
 
 UPDATE `creature_template` SET `unit_flags`=768, `flags_extra`=0, `ScriptName`='npc_quel_delar_sword', `InhabitType`=7 WHERE `entry`=37158;
 UPDATE `creature_template` SET `ScriptName`='npc_uther_quel_delar' WHERE `entry`=37225;
