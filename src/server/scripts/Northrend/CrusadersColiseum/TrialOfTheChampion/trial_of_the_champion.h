@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -85,13 +85,13 @@ enum GameObjects
     GO_MAIN_GATE                = 195647,
 
     GO_CHAMPIONS_LOOT           = 195709,
-    GO_CHAMPIONS_LOOT_H            = 195710,
+    GO_CHAMPIONS_LOOT_H         = 195710,
 
     GO_EADRIC_LOOT              = 195374,
     GO_EADRIC_LOOT_H            = 195375,
 
     GO_PALETRESS_LOOT           = 195323,
-    GO_PALETRESS_LOOT_H            = 195324
+    GO_PALETRESS_LOOT_H         = 195324
 };
 
 enum Vehicles
