@@ -1,5 +1,4 @@
 DELETE FROM `achievement_criteria_data` WHERE `type`=11 AND `criteria_id`=3693;
-INSERT INTO `achievement_criteria_data` VALUES
 UPDATE `achievement_criteria_data` SET `ScriptName` = 'achievement_bg_control_all_nodes' WHERE `type` =11 AND `criteria_id` =3693;
 -- Achievement: Pilgrims Peril
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (11134,11135,11136,11137,11138,11139,11140,11141);

@@ -12,7 +12,7 @@ UPDATE `creature_template` SET `spell1`=66260, `spell2`=61784, `spell3`=61785, `
 UPDATE `creature_template` SET `spell1`=66262, `spell2`=61784, `spell3`=61785, `spell4`=61788, `spell5`=61786, `spell6`=61787 WHERE `entry`=34824; -- The Sweet Potato Chair
 
 -- Item: Turkey Caller
-UPDATE `creature_template` SET `faction_A`=35, `faction_H`=35, `ScriptName` = 'EC_npc_lonely_turkey' WHERE `entry` =32956; -- Lonely Turkey
+UPDATE `creature_template` SET `faction`=35, `ScriptName` = 'EC_npc_lonely_turkey' WHERE `entry` =32956; -- Lonely Turkey
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (34823,34812,34824,34822,34819);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES
