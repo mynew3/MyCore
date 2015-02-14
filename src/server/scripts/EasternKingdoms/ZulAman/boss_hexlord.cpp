@@ -693,65 +693,53 @@ class boss_gazakroth : public CreatureScript
 {
     public:
 
-        boss_gazakroth()
-            : CreatureScript("boss_gazakroth")
+        boss_gazakroth() : CreatureScript("boss_gazakroth") { }
+        
+        struct boss_gazakrothAI : public boss_hexlord_addAI
+        {
+            boss_gazakrothAI(Creature* creature) : boss_hexlord_addAI(creature)
             {
+                Initialize();
             }
 
-            struct boss_gazakrothAI : public boss_hexlord_addAI
+            void Initialize()
             {
-                boss_gazakrothAI(Creature* creature) : boss_hexlord_addAI(creature)
-                {
-                    Initialize();
-                }
-
-                void Initialize()
-                {
-                    firebolt_timer = 2000;
-                }
-
-                uint32 firebolt_timer;
-
-                void Reset() override
-                {
-                    Initialize();
-                    boss_hexlord_addAI::Reset();
-                }
-
-                void AttackStart(Unit* who) override
-                {
-                    if (!who)
-                        return;
-
-                    if (who->isTargetableForAttack())
-                    {
-                        if (me->Attack(who, false))
-                        {
-                            me->GetMotionMaster()->MoveChase(who, 20);
-                            me->AddThreat(who, 0.0f);
-                        }
-                    }
-                }
-
-                void UpdateAI(uint32 diff) override
-                {
-                    if (!UpdateVictim())
-                        return;
-
-                    if (firebolt_timer <= diff)
-                    {
-                        DoCastVictim(SPELL_FIREBOLT, false);
-                        firebolt_timer = 700;
-                    } else firebolt_timer -= diff;
-
-                    boss_hexlord_addAI::UpdateAI(diff);
-                }
-            };
-
-            CreatureAI* GetAI(Creature *creature) const override
-            {
-                return GetInstanceAI<boss_gazakrothAI>(creature);
+                firebolt_timer = 2 * IN_MILLISECONDS;
             }
+            
+            void Reset() override
+            {
+                Initialize();
+                boss_hexlord_addAI::Reset();
+            }
+
+            void AttackStart(Unit* who) override
+            {
+                AttackStartCaster(who, 20.0f);
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (firebolt_timer <= diff)
+                {
+                    DoCastVictim(SPELL_FIREBOLT, false);
+                    firebolt_timer = 0.7 * IN_MILLISECONDS;
+                } else firebolt_timer -= diff;
+
+                boss_hexlord_addAI::UpdateAI(diff);
+            }
+
+        private:
+            uint32 firebolt_timer;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetInstanceAI<boss_gazakrothAI>(creature);
+        }
 };
 
 class boss_lord_raadan : public CreatureScript
@@ -1077,7 +1065,7 @@ void AddSC_boss_hex_lord_malacrass()
 {
     new boss_hexlord_malacrass();
     new boss_thurg();
-    // new boss_gazakroth();
+    new boss_gazakroth();
     new boss_lord_raadan();
     new boss_darkheart();
     new boss_slither();
