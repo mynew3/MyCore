@@ -23,8 +23,8 @@
 
 enum eAchievements
 {
-    SHOCKING_10    = 2923,
-    SHOCKING_25    = 2178
+    SHOCKING_10    = 2178,
+    SHOCKING_25    = 2179
 };
 
 //Stalagg
