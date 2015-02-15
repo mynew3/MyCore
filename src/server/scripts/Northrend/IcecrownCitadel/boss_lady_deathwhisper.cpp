@@ -24,6 +24,12 @@
 #include "SpellInfo.h"
 #include "Player.h"
 
+enum eAchievements
+{
+   FULL_HOUSE_10    = 4535,
+   FULL_HOUSE_25    = 4611
+};
+
 enum ScriptTexts
 {
     // Lady Deathwhisper
@@ -365,6 +371,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (events.IsInPhase(PHASE_ONE) && damage > me->GetPower(POWER_MANA))
                 {
                     Talk(SAY_PHASE_2);
+					instance->DoCompleteAchievement(RAID_MODE(FULL_HOUSE_10,FULL_HOUSE_25));
                     Talk(EMOTE_PHASE_2);
                     DoStartMovement(me->GetVictim());
                     damage -= me->GetPower(POWER_MANA);
