@@ -24,6 +24,13 @@
 #include "ulduar.h"
 #include "SpellInfo.h"
 #include "Player.h"
+#include "InstanceScript.h"
+
+enum eAchievements
+{
+    IRON_DWARF_10    = 2923,
+    IRON_DWARF_25    = 2924
+};
 
 enum Says
 {
@@ -227,12 +234,14 @@ class boss_razorscale_controller : public CreatureScript
             void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
+				
             }
 
             void DoAction(int32 action) override
             {
                 if (instance->GetBossState(BOSS_RAZORSCALE) != IN_PROGRESS)
                     return;
+
 
                 switch (action)
                 {
@@ -243,7 +252,7 @@ class boss_razorscale_controller : public CreatureScript
                         break;
                     case ACTION_PLACE_BROKEN_HARPOON:
                         for (uint8 n = 0; n < RAID_MODE(2, 4); n++)
-                            me->SummonGameObject(GO_RAZOR_BROKEN_HARPOON, PosHarpoon[n].GetPositionX(), PosHarpoon[n].GetPositionY(), PosHarpoon[n].GetPositionZ(), 2.286f, 0, 0, 0, 0, 180);
+                            me->SummonGameObject(GO_RAZOR_BROKEN_HARPOON, PosHarpoon[n].GetPositionX(), PosHarpoon[n].GetPositionY(), PosHarpoon[n].GetPositionZ(), 2.286f, 0, 0, 0, 0, 180);							
                         break;
                 }
             }
@@ -384,6 +393,7 @@ class boss_razorscale : public CreatureScript
             void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
+				instance->DoCompleteAchievement(RAID_MODE(IRON_DWARF_10,IRON_DWARF_25));
                 if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZORSCALE_CONTROL)))
                     controller->AI()->Reset();
             }
