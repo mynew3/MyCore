@@ -1206,15 +1206,9 @@ class spell_algalon_big_bang : public SpellScriptLoader
         {
             PrepareSpellScript(spell_algalon_big_bang_SpellScript);
 
-        public:
-            spell_algalon_big_bang_SpellScript()
-            {
-                _targetCount = 0;
-            }
-
-        private:
             bool Load() override
             {
+                _targetCount = 0;
                 return GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->IsAIEnabled;
             }
 
@@ -1225,8 +1219,9 @@ class spell_algalon_big_bang : public SpellScriptLoader
 
             void CheckTargets()
             {
-                if (!_targetCount)
-                    GetCaster()->GetAI()->DoAction(ACTION_ASCEND);
+                if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+                    if (!_targetCount)
+                        GetCaster()->GetAI()->DoAction(ACTION_ASCEND);
             }
 
             void Register() override

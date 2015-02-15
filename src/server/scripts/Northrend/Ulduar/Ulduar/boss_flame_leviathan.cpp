@@ -287,7 +287,6 @@ class boss_flame_leviathan : public CreatureScript
                 events.ScheduleEvent(EVENT_SHUTDOWN, 150*IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_SPEED, 15*IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_SUMMON, 1*IN_MILLISECONDS);
-                instance->HandleGameObject(instance->GetGuidData(DATA_LEVIATHAN_FORCEFIELD), false);
                 ActiveTower(); //void ActiveTower
             }
 
@@ -389,7 +388,7 @@ class boss_flame_leviathan : public CreatureScript
                     return;
                 }
 
-                if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_STUNNED))
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 while (uint32 eventId = events.ExecuteEvent())
@@ -430,7 +429,7 @@ class boss_flame_leviathan : public CreatureScript
                             break;
                         case EVENT_REPAIR:
                             Talk(EMOTE_REPAIR);
-                            //me->ClearUnitState(UNIT_STATE_STUNNED | UNIT_STATE_ROOT);
+                            me->ClearUnitState(UNIT_STATE_STUNNED | UNIT_STATE_ROOT);
                             events.ScheduleEvent(EVENT_SHUTDOWN, 150*IN_MILLISECONDS);
                             events.CancelEvent(EVENT_REPAIR);
                             break;
@@ -476,11 +475,6 @@ class boss_flame_leviathan : public CreatureScript
             {
                 if (spell->Id == SPELL_PURSUED)
                     _pursueTarget = target->GetGUID();
-            }
-
-            void JustReachedHome() override
-            {
-                instance->HandleGameObject(instance->GetGuidData(DATA_LEVIATHAN_FORCEFIELD), false);
             }
 
             void DoAction(int32 action) override
@@ -554,14 +548,6 @@ class boss_flame_leviathan : public CreatureScript
                     if (me->isAttackReady())
                     {
                         Unit* target = ObjectAccessor::GetUnit(*me, _pursueTarget);
-
-                        // Pursue was unable to acquire a valid target, so get the current victim as target.
-                        if (!target && me->GetVictim())
-                        {
-                            target = me->GetVictim();
-                            me->AI()->AttackStart(target);
-                        }
-
                         if (me->IsWithinCombatRange(target, 30.0f))
                         {
                             DoCast(target, SPELL_BATTERING_RAM);
@@ -1636,7 +1622,6 @@ class spell_systems_shutdown : public SpellScriptLoader
                 if (!owner)
                     return;
 
-                owner->ClearUnitState(UNIT_STATE_STUNNED | UNIT_STATE_ROOT);
                 owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
             }
 
@@ -1665,7 +1650,7 @@ class FlameLeviathanPursuedTargetSelector
 
         bool operator()(WorldObject* target) const
         {
-            //! No players, only vehicles. Pursue is never cast on players.
+            //! No players, only vehicles (@todo check if blizzlike)
             Creature* creatureTarget = target->ToCreature();
             if (!creatureTarget)
                 return true;
@@ -1705,17 +1690,21 @@ class spell_pursue : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pursue_SpellScript);
 
-        public:
-            spell_pursue_SpellScript()
+            bool Load() override
             {
-                _target = nullptr;
+                _target = NULL;
+                return true;
             }
 
-        private:
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove_if(FlameLeviathanPursuedTargetSelector(GetCaster()));
-                if (!targets.empty())
+                if (targets.empty())
+                {
+                    if (Creature* caster = GetCaster()->ToCreature())
+                        caster->AI()->EnterEvadeMode();
+                }
+                else
                 {
                     //! In the end, only one target should be selected
                     _target = Trinity::Containers::SelectRandomContainerElement(targets);
@@ -1734,9 +1723,6 @@ class spell_pursue : public SpellScriptLoader
             {
                 Creature* caster = GetCaster()->ToCreature();
                 if (!caster)
-                    return;
-
-                if (caster->HasUnitState(UNIT_STATE_STUNNED))
                     return;
 
                 caster->AI()->AttackStart(GetHitUnit());    // Chase target

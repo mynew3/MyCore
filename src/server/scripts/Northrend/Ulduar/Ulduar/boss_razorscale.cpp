@@ -203,7 +203,6 @@ class boss_razorscale_controller : public CreatureScript
             {
                 _Reset();
                 me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
             }
 
             void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -256,6 +255,12 @@ class boss_razorscale_controller : public CreatureScript
                         break;
                 }
             }
+            
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    instance->SetData(DATA_CRITERIA_RAZORSCALE, 1);
+            }
 
             void UpdateAI(uint32 Diff) override
             {
@@ -273,7 +278,6 @@ class boss_razorscale_controller : public CreatureScript
                                     BrokenHarpoon->RemoveFromWorld();
                                 events.ScheduleEvent(EVENT_BUILD_HARPOON_2, 20000);
                                 events.CancelEvent(EVENT_BUILD_HARPOON_1);
-                                Harpoon->SetOwnerGUID(ObjectGuid::Empty);
                             }
                             return;
                         case EVENT_BUILD_HARPOON_2:
@@ -283,7 +287,6 @@ class boss_razorscale_controller : public CreatureScript
                                 if (GameObject* BrokenHarpoon = Harpoon->FindNearestGameObject(GO_RAZOR_BROKEN_HARPOON, 5.0f))
                                     BrokenHarpoon->RemoveFromWorld();
                                 events.CancelEvent(EVENT_BUILD_HARPOON_2);
-                                Harpoon->SetOwnerGUID(ObjectGuid::Empty);
                             }
                             return;
                         case EVENT_BUILD_HARPOON_3:
@@ -294,7 +297,6 @@ class boss_razorscale_controller : public CreatureScript
                                     BrokenHarpoon->RemoveFromWorld();
                                 events.ScheduleEvent(EVENT_BUILD_HARPOON_4, 20000);
                                 events.CancelEvent(EVENT_BUILD_HARPOON_3);
-                                Harpoon->SetOwnerGUID(ObjectGuid::Empty);
                             }
                             return;
                         case EVENT_BUILD_HARPOON_4:
@@ -304,7 +306,6 @@ class boss_razorscale_controller : public CreatureScript
                                 if (GameObject* BrokenHarpoon = Harpoon->FindNearestGameObject(GO_RAZOR_BROKEN_HARPOON, 5.0f))
                                     BrokenHarpoon->RemoveFromWorld();
                                 events.CancelEvent(EVENT_BUILD_HARPOON_4);
-                                Harpoon->SetOwnerGUID(ObjectGuid::Empty);
                             }
                             return;
                     }
@@ -421,6 +422,12 @@ class boss_razorscale : public CreatureScript
                         return 1;
 
                 return 0;
+            }
+
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    instance->SetData(DATA_CRITERIA_RAZORSCALE, 1);
             }
 
             void UpdateAI(uint32 Diff) override
@@ -878,6 +885,12 @@ class npc_devouring_flame : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             }
 
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    me->GetInstanceScript()->SetData(DATA_CRITERIA_RAZORSCALE, 1);
+            }
+
             void Reset() override
             {
                 DoCast(SPELL_FLAME_GROUND);
@@ -914,6 +927,12 @@ class npc_darkrune_watcher : public CreatureScript
             void Reset() override
             {
                 Initialize();
+            }
+
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    me->GetInstanceScript()->SetData(DATA_CRITERIA_RAZORSCALE, 1);
             }
 
             void UpdateAI(uint32 Diff) override
@@ -983,6 +1002,11 @@ class npc_darkrune_guardian : public CreatureScript
                     killedByBreath = value != 0;
             }
 
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    me->GetInstanceScript()->SetData(DATA_CRITERIA_RAZORSCALE, 1);
+            }
 
             void UpdateAI(uint32 Diff) override
             {
@@ -1036,6 +1060,12 @@ class npc_darkrune_sentinel : public CreatureScript
             void Reset() override
             {
                 Initialize();
+            }
+
+            void KilledUnit(Unit* who) override
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    me->GetInstanceScript()->SetData(DATA_CRITERIA_RAZORSCALE, 1);
             }
 
             void UpdateAI(uint32 Diff) override
