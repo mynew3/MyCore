@@ -197,6 +197,9 @@ class InstanceScript : public ZoneScript
 
         // Sends world state update to all players in instance
         void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);
+		
+        // Complete Achievement for all players in instance
+        DECLSPEC_DEPRECATED void DoCompleteAchievement(uint32 achievement) ATTR_DEPRECATED;
 
         // Send Notify to all players in instance
         void DoSendNotifyToInstance(char const* format, ...);
