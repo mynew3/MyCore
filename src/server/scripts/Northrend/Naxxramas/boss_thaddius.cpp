@@ -21,6 +21,12 @@
 #include "Player.h"
 #include "naxxramas.h"
 
+enum eAchievements
+{
+    SHOCKING_10    = 2923,
+    SHOCKING_25    = 2178
+};
+
 //Stalagg
 enum StalaggYells
 {
@@ -157,6 +163,7 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
+			instance->DoCompleteAchievement(RAID_MODE(SHOCKING_10,SHOCKING_25));
         }
 
         void DoAction(int32 action) override
