@@ -18,9 +18,6 @@ set(scripts_STAT_SRCS
   Custom/WorldEvents/EC_pilgrim.cpp
   ${scripts_STAT_SRCS}
 #  ${sources_Custom}
-    Custom/Transmog/Transmogrification.h
-    Custom/Transmog/Transmogrification.cpp
-    Custom/Transmog/Transmogrifier.cpp
 	Custom/mod_duel_reset.cpp
 	Custom/npc_teleporter.cpp
 )

@@ -965,6 +965,7 @@ CREATE TABLE `creature_respawn` (
 -- ----------------------------
 
 -- ----------------------------
+<<<<<<< HEAD
 -- Table structure for custom_transmogrification
 -- ----------------------------
 DROP TABLE IF EXISTS `custom_transmogrification`;
@@ -1018,6 +1019,8 @@ CREATE TABLE `daily_players_reports` (
 -- ----------------------------
 
 -- ----------------------------
+=======
+>>>>>>> parent of 0aeb8bd... *Добавление Трансмогрификации
 -- Table structure for gameobject_respawn
 -- ----------------------------
 DROP TABLE IF EXISTS `gameobject_respawn`;
