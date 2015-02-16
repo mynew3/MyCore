@@ -36,16 +36,16 @@ enum UlduarBosses
     BOSS_ASSEMBLY_OF_IRON    = 4,
     BOSS_KOLOGARN            = 5,
     BOSS_AURIAYA             = 6,
-    BOSS_MIMIRON             = 7,
-    BOSS_HODIR               = 8,
-    BOSS_THORIM              = 9,
-    BOSS_FREYA               = 10,
-    BOSS_BRIGHTLEAF          = 11,
-    BOSS_IRONBRANCH          = 12,
-    BOSS_STONEBARK           = 13,
-    BOSS_VEZAX               = 14,
-    BOSS_YOGG_SARON          = 15,
-    BOSS_ALGALON             = 16,
+    BOSS_HODIR               = 7,
+    BOSS_THORIM              = 8,
+    BOSS_FREYA               = 9,
+    BOSS_MIMIRON             = 10,
+    BOSS_VEZAX               = 11,
+    BOSS_YOGG_SARON          = 12,
+    BOSS_ALGALON             = 13,
+    BOSS_BRIGHTLEAF          = 14,
+    BOSS_IRONBRANCH          = 15,
+    BOSS_STONEBARK           = 16,
 };
 
 enum UlduarNPCs
@@ -78,6 +78,8 @@ enum UlduarNPCs
     NPC_VEZAX                               = 33271,
     NPC_YOGG_SARON                          = 33288,
     NPC_ALGALON                             = 32871,
+    NPC_BRONZEBEARD_FLYING_MACHINE          = 34120,
+    NPC_BRONZEBEARD_RADIO                   = 34054,
 
     // Mimiron
     NPC_LEVIATHAN_MKII                      = 33432,
@@ -128,6 +130,9 @@ enum UlduarNPCs
     NPC_IRONROOT_LASHER                     = 33526,
     NPC_NATURES_BLADE                       = 33527,
     NPC_GUARDIAN_OF_LIFE                    = 33528,
+
+    // Freya Achievement Trigger
+    NPC_FREYA_ACHIEVE_TRIGGER               = 33406,
 
     // Yogg-Saron
     NPC_SARA                                = 33134,
@@ -188,6 +193,8 @@ enum UlduarNPCs
     NPC_MERCENARY_SOLDIER_H                 = 32883,
     NPC_RUNIC_COLOSSUS                      = 32872,
     NPC_RUNE_GIANT                          = 32873,
+
+    NPC_SANCTUM_SENTRY                      = 34014
 };
 
 enum UlduarGameObjects
@@ -270,8 +277,7 @@ enum UlduarGameObjects
     GO_THORIM_STONE_DOOR                    = 194558,
     GO_THORIM_RUNIC_DOOR                    = 194557,
 
-    // The Ancient Gate of the Keepers
-    GO_ANCIENT_GATE             = 194255    
+    GO_ANCIENT_GATE                         = 194255
 };
 
 enum EventIds
@@ -300,16 +306,6 @@ enum UlduarAchievementCriteriaIds
     CRITERIA_DISARMED                        = 21687,
     CRITERIA_CANT_DO_THAT_WHILE_STUNNED_10   = 10422,
     CRITERIA_CANT_DO_THAT_WHILE_STUNNED_25   = 10424,
-    CRITERIA_GETTING_COLD_IN_HERE_10         = 10247,
-    CRITERIA_GETTING_COLD_IN_HERE_25         = 10248,
-    CRITERIA_THIS_CACHE_WAS_RARE_10          = 10452,
-    CRITERIA_THIS_CACHE_WAS_RARE_25          = 10458,
-    CRITERIA_COOLEST_FRIENDS_10              = 10258,
-    CRITERIA_COOLEST_FRIENDS_25              = 10260,
-    CRITERIA_CHEESE_THE_FREEZE_10            = 10259,
-    CRITERIA_CHEESE_THE_FREEZE_25            = 10261,
-    CRITERIA_LUMBERJACKED_10                 = 10720,
-    CRITERIA_LUMBERJACKED_25                 = 10721,
     CRITERIA_WAITS_DREAMING_STORMWIND_25     = 10321,
     CRITERIA_WAITS_DREAMING_CHAMBER_25       = 10322,
     CRITERIA_WAITS_DREAMING_ICECROWN_25      = 10323,
@@ -328,33 +324,47 @@ enum UlduarAchievementCriteriaIds
     CRITERIA_ALONE_IN_THE_DARKNESS_25        = 10417,
     CRITERIA_HERALD_OF_TITANS                = 10678,
 
-    // Champion/Conqueror of Ulduar
-    CRITERIA_FLAME_LEVIATHAN_10                         = 10042,
-    CRITERIA_IGNIS_10                                   = 10342,
-    CRITERIA_RAZORSCALE_10                              = 10340,
-    CRITERIA_XT_002_10                                  = 10341,
-    CRITERIA_ASSEMBLY_OF_IRON_10                        = 10598,
-    CRITERIA_KOLOGARN_10                                = 10348,
-    CRITERIA_AURIAYA_10                                 = 10351,
-    CRITERIA_HODIR_10                                   = 10439,
-    CRITERIA_THORIM_10                                  = 10403,
-    CRITERIA_FREYA_10                                   = 10582,
-    CRITERIA_MIMIRON_10                                 = 10347,
-    CRITERIA_GENERAL_VEZAX_10                           = 10349,
-    CRITERIA_YOGG_SARON_10                              = 10350,
-    CRITERIA_FLAME_LEVIATHAN_25                         = 10352,
-    CRITERIA_IGNIS_25                                   = 10355,
-    CRITERIA_RAZORSCALE_25                              = 10353,
-    CRITERIA_XT_002_25                                  = 10354,
-    CRITERIA_ASSEMBLY_OF_IRON_25                        = 10599,
-    CRITERIA_KOLOGARN_25                                = 10357,
-    CRITERIA_AURIAYA_25                                 = 10363,
-    CRITERIA_HODIR_25                                   = 10719,
-    CRITERIA_THORIM_25                                  = 10404,
-    CRITERIA_FREYA_25                                   = 10583,
-    CRITERIA_MIMIRON_25                                 = 10361,
-    CRITERIA_GENERAL_VEZAX_25                           = 10362,
-    CRITERIA_YOGG_SARON_25                              = 10364,
+    // TrueWoW
+    CRITERIA_GETTING_COLD_IN_HERE_10 = 10247,
+    CRITERIA_GETTING_COLD_IN_HERE_25 = 10248,
+    CRITERIA_THIS_CACHE_WAS_RARE_10  = 10452,
+    CRITERIA_THIS_CACHE_WAS_RARE_25  = 10458,
+    CRITERIA_COOLEST_FRIENDS_10      = 10258,
+    CRITERIA_COOLEST_FRIENDS_25      = 10260,
+    CRITERIA_CHEESE_THE_FREEZE_10    = 10259,
+    CRITERIA_CHEESE_THE_FREEZE_25    = 10261,
+    CRITERIA_RUBBLE_N_ROLL_10        = 10290,
+    CRITERIA_RUBBLE_N_ROLL_25        = 10133,
+    CRITERIA_WITH_OPEN_ARMS_10       = 10285,
+    CRITERIA_WITH_OPEN_ARMS_25       = 10095,
+    // Champion of Ulduar
+    CRITERIA_C_O_U_LEVIATHAN_10              = 10042,
+    CRITERIA_C_O_U_IGNIS_10                  = 10342,
+    CRITERIA_C_O_U_RAZORSCALE_10             = 10340,
+    CRITERIA_C_O_U_XT002_10                  = 10341,
+    CRITERIA_C_O_U_IRON_COUNCIL_10           = 10598,
+    CRITERIA_C_O_U_KOLOGARN_10               = 10348,
+    CRITERIA_C_O_U_AURIAYA_10                = 10351,
+    CRITERIA_C_O_U_HODIR_10                  = 10439,
+    CRITERIA_C_O_U_THORIM_10                 = 10403,
+    CRITERIA_C_O_U_FREYA_10                  = 10582,
+    CRITERIA_C_O_U_MIMIRON_10                = 10347,
+    CRITERIA_C_O_U_VEZAX_10                  = 10349,
+    CRITERIA_C_O_U_YOGG_SARON_10             = 10350,
+    // Conqueror of Ulduar
+    CRITERIA_C_O_U_LEVIATHAN_25              = 10352,
+    CRITERIA_C_O_U_IGNIS_25                  = 10355,
+    CRITERIA_C_O_U_RAZORSCALE_25             = 10353,
+    CRITERIA_C_O_U_XT002_25                  = 10354,
+    CRITERIA_C_O_U_IRON_COUNCIL_25           = 10599,
+    CRITERIA_C_O_U_KOLOGARN_25               = 10357,
+    CRITERIA_C_O_U_AURIAYA_25                = 10363,
+    CRITERIA_C_O_U_HODIR_25                  = 10719,
+    CRITERIA_C_O_U_THORIM_25                 = 10404,
+    CRITERIA_C_O_U_FREYA_25                  = 10583,
+    CRITERIA_C_O_U_MIMIRON_25                = 10361,
+    CRITERIA_C_O_U_VEZAX_25                  = 10362,
+    CRITERIA_C_O_U_YOGG_SARON_25             = 10364
 };
 
 enum UlduarData
@@ -376,7 +386,7 @@ enum UlduarData
     DATA_STEELBREAKER,
     DATA_MOLGEIM,
     DATA_BRUNDIR,
-    DATA_STUNNED, 
+    DATA_STUNNED,  // Achievement IDs: 10422,10424
 
     // Hodir
     DATA_HODIR_RARE_CACHE,
@@ -420,25 +430,12 @@ enum UlduarData
     DATA_RUNIC_COLOSSUS,
     DATA_RUNE_GIANT,
 
-    DATA_CRITERIA_FLAME_LEVIATHAN,  // Achievement IDs: 10042,10352
-    DATA_CRITERIA_IGNIS,            // Achievement IDs: 10342,10355
-    DATA_CRITERIA_RAZORSCALE,       // Achievement IDs: 10340,10353
-    DATA_CRITERIA_XT_002,           // Achievement IDs: 10341,10354
-    DATA_CRITERIA_ASSEMBLY_OF_IRON, // Achievement IDs: 10598,10599
-    DATA_CRITERIA_KOLOGARN,         // Achievement IDs: 10348,10357
-    DATA_CRITERIA_AURIAYA,          // Achievement IDs: 10351,10363
-    DATA_CRITERIA_HODIR,            // Achievement IDs: 10439,10719
-    DATA_CRITERIA_THORIM,           // Achievement IDs: 10403,10404
-    DATA_CRITERIA_FREYA,            // Achievement IDs: 10582,10583
-    DATA_CRITERIA_MIMIRON,          // Achievement IDs: 10347,10361
-    DATA_CRITERIA_GENERAL_VEZAX,    // Achievement IDs: 10349,10362
-    DATA_CRITERIA_YOGG_SARON,       // Achievement IDs: 10350,10364
-
-    // Hodir
+    // TrueWoW
     DATA_GETTING_COLD_IN_HERE,
-    //DATA_HODIR_RARE_CACHE,
     DATA_COOLEST_FRIENDS,
     DATA_CHEESE_THE_FREEZE,
+    DATA_WITH_OPEN_ARMS,
+    DATA_LEVIATHAN_FORCEFIELD
 };
 
 enum UlduarWorldStates
@@ -453,13 +450,25 @@ enum UlduarAchievementData
     DATA_UNBROKEN = 29052906, // 2905, 2906 are achievement IDs,
     MAX_HERALD_ARMOR_ITEMLEVEL  = 226,
     MAX_HERALD_WEAPON_ITEMLEVEL = 232,
+    SPELL_LUMBERJACKED_CREDIT = 65296
 };
 
 enum UlduarEvents
 {
     EVENT_DESPAWN_ALGALON       = 1,
     EVENT_UPDATE_ALGALON_TIMER  = 2,
+    EVENT_BRANN_RADIO           = 3,
+    EVENT_BRANN_RADIO2          = 4,
+    EVENT_LEVIATHAN_BREAKTHROUGH = 5,
     ACTION_INIT_ALGALON         = 6,
+    EVENT_ACTIVATE_FORCEFIELD,
+};
+
+enum UlduarTexts
+{
+    SAY_BRANN_RADIO_LEVIATHAN,
+    SAY_BRANN_RADIO_LEVIATHAN2,
+    SAY_BRANN_RADIO_LEVIATHAN3
 };
 
 enum YoggSaronIllusions

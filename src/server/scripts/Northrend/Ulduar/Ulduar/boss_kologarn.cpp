@@ -163,7 +163,8 @@ class boss_kologarn : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                Talk(SAY_DEATH);				
+                Talk(SAY_DEATH);
+                instance->DoCompleteAchievement(RAID_MODE(DISARMED_10,DISARMED_25));				
                 DoCast(SPELL_KOLOGARN_PACIFY);
                 me->GetMotionMaster()->MoveTargetedHome();
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -194,8 +195,7 @@ class boss_kologarn : public CreatureScript
                     {
                         _armDied = true;
                         Talk(SAY_LEFT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESPAWN_LEFT_ARM, 40000);
-						instance->DoCompleteAchievement(RAID_MODE(DISARMED_10,DISARMED_25));
+                        events.ScheduleEvent(EVENT_RESPAWN_LEFT_ARM, 40000);						
                     }
                 }
 

@@ -50,8 +50,8 @@ enum Spells
     SPELL_HEAT                  = 65667,
     SPELL_MOLTEN                = 62373,
     SPELL_BRITTLE               = 62382,
+    SPELL_BRITTLE_25            = 67114,
     SPELL_SHATTER               = 62383,
-    SPELL_SHATTER_HC            = 67114,
     SPELL_GROUND                = 62548,
 };
 
@@ -170,10 +170,7 @@ class boss_ignis : public CreatureScript
             void KilledUnit(Unit* who) override
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
-                {
                     Talk(SAY_SLAY);
-                    instance->SetData(DATA_CRITERIA_IGNIS, 1);
-                }
             }
 
             void JustSummoned(Creature* summon) override
@@ -223,7 +220,7 @@ class boss_ignis : public CreatureScript
                             events.ScheduleEvent(EVENT_JET, urand(35000, 40000));
                             break;
                         case EVENT_SLAG_POT:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                             {
                                 Talk(SAY_SLAG_POT);
                                 _slagPotGUID = target->GetGUID();
@@ -244,7 +241,7 @@ class boss_ignis : public CreatureScript
                         case EVENT_CHANGE_POT:
                             if (Unit* slagPotTarget = ObjectAccessor::GetUnit(*me, _slagPotGUID))
                             {
-                                slagPotTarget->AddAura(SPELL_SLAG_POT, slagPotTarget);
+                                DoCast(slagPotTarget, SPELL_SLAG_POT, true);
                                 slagPotTarget->EnterVehicle(me, 1);
                                 events.CancelEvent(EVENT_CHANGE_POT);
                                 events.ScheduleEvent(EVENT_END_POT, 10000);
@@ -324,7 +321,7 @@ class npc_iron_construct : public CreatureScript
 
             void DamageTaken(Unit* /*attacker*/, uint32& damage) override
             {
-                if (me->HasAura(RAID_MODE(SPELL_BRITTLE, SPELL_SHATTER_HC)) && damage >= 5000)
+                if (me->HasAura(RAID_MODE(SPELL_BRITTLE, SPELL_BRITTLE_25)) && damage >= 5000)
                 {
                     DoCast(SPELL_SHATTER);
                     if (Creature* ignis = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(BOSS_IGNIS)))
@@ -333,12 +330,6 @@ class npc_iron_construct : public CreatureScript
 
                     me->DespawnOrUnsummon(1000);
                 }
-            }
-            
-            void KilledUnit(Unit* who) override
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                    me->GetInstanceScript()->SetData(DATA_CRITERIA_IGNIS, 1);
             }
 
             void UpdateAI(uint32 /*uiDiff*/) override
@@ -467,14 +458,13 @@ class spell_ignis_slag_pot : public SpellScriptLoader
                 return true;
             }
 
-            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
             {
-                Unit* aurEffCaster = aurEff->GetCaster();
-                if (!aurEffCaster)
-                    return;
-
-                Unit* target = GetTarget();
-                aurEffCaster->CastSpell(target, SPELL_SLAG_POT_DAMAGE, true);
+                if (Unit* caster = GetCaster())
+                {
+                    Unit* target = GetTarget();
+                    caster->CastSpell(target, SPELL_SLAG_POT_DAMAGE, true);
+                }
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
