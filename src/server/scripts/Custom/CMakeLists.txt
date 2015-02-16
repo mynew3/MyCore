@@ -20,6 +20,9 @@ set(scripts_STAT_SRCS
 #  ${sources_Custom}
 	Custom/mod_duel_reset.cpp
 	Custom/npc_teleporter.cpp
+    Custom/Transmog/Transmogrification.h
+    Custom/Transmog/Transmogrification.cpp
+    Custom/Transmog/Transmogrifier.cpp
 )
 
 message("  -> Prepared: Custom")

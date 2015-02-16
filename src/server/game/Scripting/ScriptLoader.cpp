@@ -690,6 +690,8 @@ void AddSC_outdoorpvp_zm();
 void AddSC_chat_log();
 void AddSC_action_ip_logger();
 
+void AddSC_PWS_Transmogrification();
+void AddSC_CS_Transmogrification();
 #endif
 
 void AddScripts()
@@ -1431,6 +1433,8 @@ void AddCustomScripts()
      AddSC_DuelReset();
 	 AddSC_custom();
 	 AddSC_TeLe_gossip_codebox();
-	AddSC_custom();
-
+	 AddSC_custom();
+	 AddSC_PWS_Transmogrification();
+     AddSC_CS_Transmogrification();
+#endif
 }
