@@ -23,6 +23,12 @@
 #include "Vehicle.h"
 #include "Player.h"
 
+enum eAchievements
+{
+    DISARMED_10    = 2953,
+    DISARMED_25    = 2954
+};
+
 /* ScriptData
 SDName: boss_kologarn
 SD%Complete: 90
@@ -157,7 +163,7 @@ class boss_kologarn : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                Talk(SAY_DEATH);
+                Talk(SAY_DEATH);				
                 DoCast(SPELL_KOLOGARN_PACIFY);
                 me->GetMotionMaster()->MoveTargetedHome();
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -189,6 +195,7 @@ class boss_kologarn : public CreatureScript
                         _armDied = true;
                         Talk(SAY_LEFT_ARM_GONE);
                         events.ScheduleEvent(EVENT_RESPAWN_LEFT_ARM, 40000);
+						instance->DoCompleteAchievement(RAID_MODE(DISARMED_10,DISARMED_25));
                     }
                 }
 
