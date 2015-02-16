@@ -101,8 +101,6 @@ enum Yells
 
 enum Data
 {
-    DATA_RUBBLE_AND_ROLL,
-    DATA_WITH_OPEN_ARMS,
     DATA_IF_LOOKS_COULD_KILL,
     DATA_EYEBEAM_TARGET
 };
@@ -128,10 +126,10 @@ class boss_kologarn : public CreatureScript
             }
 
             Vehicle* vehicle;
+            bool left, right;
+            bool _ifLooks;
+            bool _armDied;
             ObjectGuid eyebeamTarget;
-            bool left, right, _armDied, _ifLooks;
-
-            uint32 _rubbleCount;
 
             void EnterCombat(Unit* /*who*/) override
             {
@@ -154,9 +152,7 @@ class boss_kologarn : public CreatureScript
             void Reset() override
             {
                 _Reset();
-                _armDied = false;
                 _ifLooks = true;
-                _rubbleCount = 0;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 eyebeamTarget.Clear();
             }
@@ -179,10 +175,7 @@ class boss_kologarn : public CreatureScript
             void KilledUnit(Unit* who) override
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
-                {
-                    instance->SetData(DATA_CRITERIA_KOLOGARN, 1);
                     Talk(SAY_SLAY);
-                }
             }
 
             void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
@@ -193,9 +186,8 @@ class boss_kologarn : public CreatureScript
                     left = apply;
                     if (!apply && isEncounterInProgress)
                     {
-                        _armDied = true;
                         Talk(SAY_LEFT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESPAWN_LEFT_ARM, 40000);						
+                        events.ScheduleEvent(EVENT_RESPAWN_LEFT_ARM, 40000);
                     }
                 }
 
@@ -204,7 +196,6 @@ class boss_kologarn : public CreatureScript
                     right = apply;
                     if (!apply && isEncounterInProgress)
                     {
-                        _armDied = true;
                         Talk(SAY_RIGHT_ARM_GONE);
                         events.ScheduleEvent(EVENT_RESPAWN_RIGHT_ARM, 40000);
                     }
@@ -221,13 +212,13 @@ class boss_kologarn : public CreatureScript
                     {
                         rubbleStalker->CastSpell(rubbleStalker, SPELL_FALLING_RUBBLE, true);
                         rubbleStalker->CastSpell(rubbleStalker, SPELL_SUMMON_RUBBLE, true);
+                        who->ToCreature()->DespawnOrUnsummon();
                     }
-
-                    who->ToCreature()->DespawnOrUnsummon();
 
                     if (!right && !left)
                         events.ScheduleEvent(EVENT_STONE_SHOUT, 5000);
 
+                    _armDied = true;
                     instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_DISARMED);
                 }
                 else
@@ -241,12 +232,10 @@ class boss_kologarn : public CreatureScript
             {
                 switch (type)
                 {
-                    case DATA_RUBBLE_AND_ROLL:
-                        return (_rubbleCount >= 25) ? 1 : 0;
-                    case DATA_WITH_OPEN_ARMS:
-                        return _armDied ? 0 : 1;
                     case DATA_IF_LOOKS_COULD_KILL:
                         return _ifLooks ? 1 : 0;
+                    case DATA_WITH_OPEN_ARMS:
+                        return _armDied ? 0 : 1;
                     default:
                         break;
                 }
@@ -256,20 +245,15 @@ class boss_kologarn : public CreatureScript
 
             void SetData(uint32 uiType, uint32 uiData) override
             {
-                switch (uiType)
-                {
-                    case DATA_IF_LOOKS_COULD_KILL:
-                        _ifLooks = uiData == 1;
-                        break;
-                    default:
-                        break;
-                }
+                if (uiType == DATA_IF_LOOKS_COULD_KILL)
+                    _ifLooks = uiData;
             }
 
-            ObjectGuid GetGUID(int32 /*type = 0 */) const override
+            ObjectGuid GetGUID(int32 type) const override
             {
-                if (DATA_EYEBEAM_TARGET)
+                if (type == DATA_EYEBEAM_TARGET)
                     return eyebeamTarget;
+                
                 return ObjectGuid::Empty;
             }
 
@@ -277,9 +261,14 @@ class boss_kologarn : public CreatureScript
             {
                 switch (summon->GetEntry())
                 {
+                    case NPC_FOCUSED_EYEBEAM:
+                        summon->CastSpell(me, SPELL_FOCUSED_EYEBEAM_VISUAL_LEFT, true);
+                        break;
+                    case NPC_FOCUSED_EYEBEAM_RIGHT:
+                        summon->CastSpell(me, SPELL_FOCUSED_EYEBEAM_VISUAL_RIGHT, true);
+                        break;
                     case NPC_RUBBLE:
                         summons.Summon(summon);
-                        ++_rubbleCount;
                         // absence of break intended
                     default:
                         return;
@@ -370,7 +359,7 @@ class boss_kologarn : public CreatureScript
 
 class TW_npc_focused_eyebeam : public CreatureScript
 {
-public:
+    public:
     TW_npc_focused_eyebeam() : CreatureScript("TW_npc_focused_eyebeam") { }
 
     CreatureAI* GetAI(Creature* creature) const
@@ -414,6 +403,51 @@ public:
             }
         }
     };
+};
+
+class TW_spell_kologarn_focused_eyebeam_damage : public SpellScriptLoader
+{
+    public:
+    TW_spell_kologarn_focused_eyebeam_damage() : SpellScriptLoader("TW_spell_kologarn_focused_eyebeam_damage") { }
+
+    class TW_spell_kologarn_focused_eyebeam_damage_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(TW_spell_kologarn_focused_eyebeam_damage_SpellScript);
+
+        void HandleScript(SpellEffIndex /*eff*/)
+        {
+            Unit* target = GetHitUnit();
+            if (!target)
+                return;
+
+            if (InstanceScript* instance = target->GetInstanceScript())
+            if (Creature* kologarn = ObjectAccessor::GetCreature(*target, instance->GetGuidData(BOSS_KOLOGARN)))
+                kologarn->GetAI()->SetData(DATA_IF_LOOKS_COULD_KILL, false);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(TW_spell_kologarn_focused_eyebeam_damage_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new TW_spell_kologarn_focused_eyebeam_damage_SpellScript();
+    }
+};
+
+class TW_achievement_if_looks_could_kill : public AchievementCriteriaScript
+{
+    public:
+    TW_achievement_if_looks_could_kill(const char* name) : AchievementCriteriaScript(name) {}
+
+    bool OnCheck(Player* /*source*/, Unit* target) override
+    {
+        if (target)
+            return target->GetAI()->GetData(DATA_IF_LOOKS_COULD_KILL) == 1;
+        return false;
+    }
 };
 
 class spell_ulduar_rubble_summon : public SpellScriptLoader
@@ -736,8 +770,8 @@ class spell_kologarn_summon_focused_eyebeam : public SpellScriptLoader
             void HandleForceCast(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                Player* target = ObjectAccessor::GetPlayer(*GetCaster(), GetCaster()->GetAI()->GetGUID(DATA_EYEBEAM_TARGET));
-                target->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
+                if (Player* target = ObjectAccessor::GetPlayer(*GetCaster(), GetCaster()->GetAI()->GetGUID(DATA_EYEBEAM_TARGET)))
+                    target->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);;
             }
 
             void Register() override
@@ -753,84 +787,9 @@ class spell_kologarn_summon_focused_eyebeam : public SpellScriptLoader
         }
 };
 
-class TW_spell_kologarn_focused_eyebeam_damage : public SpellScriptLoader
-{
-public:
-    TW_spell_kologarn_focused_eyebeam_damage() : SpellScriptLoader("TW_spell_kologarn_focused_eyebeam_damage") { }
-
-    class TW_spell_kologarn_focused_eyebeam_damage_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(TW_spell_kologarn_focused_eyebeam_damage_SpellScript);
-
-        void HandleScript(SpellEffIndex /*eff*/)
-        {
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* kologarn = ObjectAccessor::GetCreature(*target, instance->GetGuidData(BOSS_KOLOGARN)))
-                    kologarn->GetAI()->SetData(DATA_IF_LOOKS_COULD_KILL, false);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(TW_spell_kologarn_focused_eyebeam_damage_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new TW_spell_kologarn_focused_eyebeam_damage_SpellScript();
-    }
-};
-
-class achievement_rubble_and_roll : public AchievementCriteriaScript
-{
-    public:
-        achievement_rubble_and_roll(const char* name) : AchievementCriteriaScript(name) {}
-
-        bool OnCheck(Player* /*source*/, Unit* target) override
-        {
-            if (target && target->IsAIEnabled)
-                return target->GetAI()->GetData(DATA_RUBBLE_AND_ROLL) == 1;
-
-            return false;
-        }
-};
-
-class achievement_with_open_arms : public AchievementCriteriaScript
-{
-    public:
-        achievement_with_open_arms(const char* name) : AchievementCriteriaScript(name) {}
-
-        bool OnCheck(Player* /*source*/, Unit* target) override
-        {
-            if (target && target->IsAIEnabled)
-                return target->GetAI()->GetData(DATA_WITH_OPEN_ARMS) == 1;
-
-            return false;
-        }
-};
-
-class TW_achievement_if_looks_could_kill : public AchievementCriteriaScript
-{
-public:
-    TW_achievement_if_looks_could_kill(const char* name) : AchievementCriteriaScript(name) {}
-
-    bool OnCheck(Player* /*source*/, Unit* target) override
-    {
-        if (target)
-            return target->GetAI()->GetData(DATA_IF_LOOKS_COULD_KILL) == 1;
-        return false;
-    }
-};
-
-
 void AddSC_boss_kologarn()
 {
     new boss_kologarn();
-    new TW_npc_focused_eyebeam();
     new spell_ulduar_rubble_summon();
     new spell_ulduar_squeezed_lifeless();
     new spell_ulduar_cancel_stone_grip();
@@ -839,11 +798,8 @@ void AddSC_boss_kologarn()
     new spell_ulduar_stone_grip();
     new spell_kologarn_stone_shout();
     new spell_kologarn_summon_focused_eyebeam();
-    new TW_spell_kologarn_focused_eyebeam_damage();
 
-    new achievement_rubble_and_roll("achievement_rubble_and_roll");
-    new achievement_rubble_and_roll("achievement_rubble_and_roll_25");
-    new achievement_with_open_arms("achievement_with_open_arms");
-    new achievement_with_open_arms("achievement_with_open_arms_25");
+    new TW_npc_focused_eyebeam();
+    new TW_spell_kologarn_focused_eyebeam_damage();
     new TW_achievement_if_looks_could_kill("TW_achievement_if_looks_could_kill");
 }
