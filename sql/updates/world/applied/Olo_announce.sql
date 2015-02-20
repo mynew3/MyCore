@@ -1,4 +1,0 @@
-INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES
-(20200, '|cffff0000[WG Announcer]:|cffff0000Battle in Wintergrasp has begun!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffff0000[јнонс WG]:|cffff0000Битва на озере ледяных оков началась!');
-INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES
-(20201, '|cffff0000[WG Announcer]:|cffff0000Battle in Wintergrasp will start in 15 minutes!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffff0000[јнонс WG]:|cffff0000Битва на озере ледяных оков начнется через 15 минут!');
