@@ -466,8 +466,6 @@ class Battleground
         uint32 GetTeamScore(uint32 TeamID) const;
 
         virtual uint32 GetPrematureWinner();
-		uint8 ClickFastStart(Player *player, GameObject *go); 
-		void DespawnCrystals();
 
         // because BattleGrounds with different types and same level range has different m_BracketId
         uint8 GetUniqueBracketId() const;
@@ -536,10 +534,6 @@ class Battleground
         bool   m_PrematureCountDown;
         uint32 m_PrematureCountDownTimer;
         std::string m_Name;
-		
-		std::set<uint64> m_playersWantFastStart;
-		std::set<GameObject*> m_crystals;
-
 
         /* Pre- and post-update hooks */
 

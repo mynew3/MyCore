@@ -24,7 +24,6 @@ set(scripts_STAT_SRCS
     Custom/Transmog/Transmogrification.h
     Custom/Transmog/Transmogrification.cpp
     Custom/Transmog/Transmogrifier.cpp
-	Custom/arena_cristal.cpp
 )
 
 message("  -> Prepared: Custom")
