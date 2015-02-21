@@ -25,6 +25,7 @@ set(scripts_STAT_SRCS
     Custom/Transmog/Transmogrification.cpp
     Custom/Transmog/Transmogrifier.cpp
 	Custom/arena_fast_start.cpp
+	Custom/GOMove/GOMove.cpp
 )
 
 message("  -> Prepared: Custom")

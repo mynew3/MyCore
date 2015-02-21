@@ -11,6 +11,7 @@ void AddSC_TeLe_gossip_codebox();
 void AddSC_PWS_Transmogrification();
 void AddSC_CS_Transmogrification();
 void AddSC_fast_arena_start();
+void AddSC_GOMove_commandscript();
 /* This is where custom scripts should be added. */
 void AddSC_custom()
 {
@@ -25,5 +26,6 @@ void AddSC_custom()
     AddSC_PWS_Transmogrification();
     AddSC_CS_Transmogrification();
 	AddSC_fast_arena_start();
+	AddSC_GOMove_commandscript();
  
 }
