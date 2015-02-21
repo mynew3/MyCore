@@ -216,6 +216,8 @@ class Battleground
     public:
         Battleground();
         virtual ~Battleground();
+		void ClickFastStart(Player *player, GameObject *go); 
+		bool DespawnCrystals();
 
         void Update(uint32 diff);
 
@@ -534,6 +536,8 @@ class Battleground
         bool   m_PrematureCountDown;
         uint32 m_PrematureCountDownTimer;
         std::string m_Name;
+		std::set<uint64> m_playersWantsFastStart;
+        std::set<GameObject*> m_crystals;
 
         /* Pre- and post-update hooks */
 
