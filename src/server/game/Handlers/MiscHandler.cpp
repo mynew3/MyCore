@@ -416,8 +416,9 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     }
 
     data.put(0, displaycount);                            // insert right count, count displayed
-    data.put(4, matchcount);                              // insert right count, count of matches
-
+    if (matchcount > 30) data.put(4, matchcount*2);      // insert right count, count of matches
+       else data.put(4, matchcount);
+	   
     SendPacket(&data);
     TC_LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
 }
