@@ -13,19 +13,25 @@
 set(scripts_STAT_SRCS
   Custom/custom.cpp
   Custom/custom_scripts.cpp
+  Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
+  Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
+  Custom/TrialOfTheChampion/EC_boss_argent_challenge.cpp
+  Custom/TrialOfTheChampion/EC_boss_grand_champions.cpp
+  Custom/TrialOfTheChampion/EC_boss_black_knight.cpp
+  Custom/TrialOfTheChampion/EC_trial_of_the_champion.cpp
   Custom/Ulduar/EC_boss_thorim.cpp
   Custom/WorldEvents/EC_boss_apothecary_trio.cpp
   Custom/WorldEvents/EC_pilgrim.cpp
+  Custom/mod_duel_reset.cpp
+  Custom/npc_teleporter.cpp
+  Custom/npc_profession.cpp
+  Custom/Transmog/Transmogrification.h
+  Custom/Transmog/Transmogrification.cpp
+  Custom/Transmog/Transmogrifier.cpp
+  Custom/arena_fast_start.cpp
+  Custom/GOMove/GOMove.cpp
   ${scripts_STAT_SRCS}
-#  ${sources_Custom}
-	Custom/mod_duel_reset.cpp
-	Custom/npc_teleporter.cpp
-	Custom/npc_profession.cpp
-    Custom/Transmog/Transmogrification.h
-    Custom/Transmog/Transmogrification.cpp
-    Custom/Transmog/Transmogrifier.cpp
-	Custom/arena_fast_start.cpp
-	Custom/GOMove/GOMove.cpp
+# ${sources_Custom}
 )
 
 message("  -> Prepared: Custom")
