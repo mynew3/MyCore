@@ -23,6 +23,12 @@
 #include "CellImpl.h"
 #include "obsidian_sanctum.h"
 
+enum eAchievements
+{
+   VOLCANO_BLOWS_10    = 2047,
+   VOLCANO_BLOWS_25    = 2048
+};
+
 enum Enums
 {
     //Sartharion Yell
@@ -182,6 +188,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_SARTHARION_DEATH);
+			instance->DoCompleteAchievement(RAID_MODE(VOLCANO_BLOWS_10,VOLCANO_BLOWS_25));
             _JustDied();
 
             if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TENEBRON)))
