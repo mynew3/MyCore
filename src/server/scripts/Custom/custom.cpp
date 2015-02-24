@@ -5,6 +5,8 @@ void AddSC_custom_scripts();
 void AddSC_EC_boss_thorim();
 void AddSC_EC_boss_apothecary_trio();
 void AddSC_EC_pilgrim();
+void AddSC_EC_hallows_end();
+void AddSC_brewfest();
 void AddSC_Professions_NPC();
 void AddSC_DuelReset();
 void AddSC_TeLe_gossip_codebox();
@@ -24,6 +26,8 @@ void AddSC_custom()
     AddSC_custom_scripts();
     AddSC_EC_boss_thorim();
     AddSC_EC_pilgrim();
+	AddSC_EC_hallows_end();
+    AddSC_brewfest();
 	AddSC_EC_boss_apothecary_trio();
 	AddSC_Professions_NPC();
 	AddSC_DuelReset();

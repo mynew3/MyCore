@@ -22,6 +22,8 @@ set(scripts_STAT_SRCS
   Custom/Ulduar/EC_boss_thorim.cpp
   Custom/WorldEvents/EC_boss_apothecary_trio.cpp
   Custom/WorldEvents/EC_pilgrim.cpp
+  Custom/WorldEvents/brewfest.cpp
+  Custom/WorldEvents/EC_hallows_end.cpp
   Custom/mod_duel_reset.cpp
   Custom/npc_teleporter.cpp
   Custom/npc_profession.cpp
