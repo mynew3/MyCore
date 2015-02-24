@@ -20,6 +20,12 @@
 #include "EC_trial_of_the_champion.h"
 #include "Vehicle.h"
 
+enum eAchievements
+{
+    TOC_5_NOR    = 4296,
+    TOC_5_GER    = 4298
+};
+
 enum Talk
 {
 
@@ -558,6 +564,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             DoCast(me, SPELL_KILL_CREDIT);
+			instance->DoCompleteAchievement(DUNGEON_MODE(TOC_5_NOR,TOC_5_GER));
             Talk(SAY_DEATH);
             
             if (TempSummon* summ = me->ToTempSummon())
