@@ -86,8 +86,8 @@ UPDATE `creature_template` SET `ScriptName` = 'EC_npc_shade_horseman' WHERE `ent
 DELETE FROM creature_text WHERE entry=23543;
 INSERT INTO creature_text (entry, groupid, id, TEXT, TYPE, LANGUAGE, probability, emote, duration, sound, COMMENT) VALUES
 (23543,1,0,'Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum. Cry for mercy, the reckoning has come!',14,0,100,1,0,11966,'Shade of the Horseman - Horseman Bomb'),
-(23543,2,0,'¡My flames have died, left not a spark. I shall send you myself, to the lifeless dark.',14,0,100,1,0,11968,'Shade of the Horseman - Horseman Out'),
-(23543,3,0,'¡Fire consumes! You''ve tried and failed. Let there be no doubt, justice prevailed!',14,0,100,1,0,11967,'Shade of the Horseman - Horseman Fire'),
+(23543,2,0,'?y flames have died, left not a spark. I shall send you myself, to the lifeless dark.',14,0,100,1,0,11968,'Shade of the Horseman - Horseman Out'),
+(23543,3,0,'?ire consumes! You''ve tried and failed. Let there be no doubt, justice prevailed!',14,0,100,1,0,11967,'Shade of the Horseman - Horseman Fire'),
 (23543,4,0,'<%s laughs>',16,0,100,11,0,11975,'Shade of the Horseman - Laugh1'),
 (23543,4,1,'<%s laughs>',16,0,100,11,0,12119,'Shade of the Horseman - Laugh2');
 
