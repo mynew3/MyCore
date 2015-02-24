@@ -1570,6 +1570,163 @@ public:
     }
 };
 
+enum PutricideTrapData
+{
+    SPELL_GIANT_INSECT_SWARM = 70475,
+    DATA_INSECT_SWARM_EVENT  = 43,
+    EVENT_SUMMON_INSECTS     = 1,
+    EVENT_FLESH_EATING_BITE  = 2,
+    NPC_FLESH_EATING_INSECT  = 37782,
+    ACTION_START_TRAP_EVENT  = 20,
+    ACTION_END_TRAP_EVENT    = 21,
+    ACTION_FAIL_TRAP_EVENT   = 22,
+    SPELL_FLESH_EATING_BITE  = 72967,
+    EVENT_CHECK_INSTANCE     = 3
+};
+
+class EC_npc_putricide_insect_trap : public CreatureScript
+{
+    public:
+        EC_npc_putricide_insect_trap() : CreatureScript("EC_npc_putricide_insect_trap") { }
+
+    struct EC_npc_putricide_insect_trapAI : public ScriptedAI
+    {
+        EC_npc_putricide_insect_trapAI(Creature* creature) : ScriptedAI(creature), _summons(me)
+        { 
+            _instance = creature->GetInstanceScript();
+            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            creature->SetDisplayId(11686);
+        }
+
+        void DoAction(int32 actionId) override
+        {
+            switch (actionId)
+            {
+                case ACTION_START_TRAP_EVENT:
+                    me->AI()->DoCastAOE(SPELL_GIANT_INSECT_SWARM);
+                    _events.ScheduleEvent(EVENT_SUMMON_INSECTS, 2000);
+                    _events.ScheduleEvent(EVENT_CHECK_INSTANCE, 5000);
+                    break;
+                case ACTION_END_TRAP_EVENT:
+                    CleanUpEvent(false);
+                    _events.Reset();
+                    break;
+                case ACTION_FAIL_TRAP_EVENT:
+                    CleanUpEvent(true);
+                    _events.Reset();
+                    _instance->SetData(DATA_INSECT_SWARM_EVENT, NOT_STARTED);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void CleanUpEvent(bool DespawnAdds)
+        {
+            me->InterruptNonMeleeSpells(true);
+            EnterEvadeMode();
+            me->SetVisible(false);
+            me->ClearAllReactives();
+
+            if (DespawnAdds)
+                _summons.DespawnAll();
+        }
+
+        void EnterCombat(Unit* /* who */) override
+        {
+            if (_instance->GetData(DATA_INSECT_SWARM_EVENT) == IN_PROGRESS)
+                SummonInsects(me);
+        }
+
+        bool CanAIAttack(Unit const* /*who*/) const override
+        {
+            if (_instance->GetData(DATA_INSECT_SWARM_EVENT) == DONE)
+                return false;
+
+            return true;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_instance->GetData(DATA_INSECT_SWARM_EVENT) == DONE)
+                me->DespawnOrUnsummon();
+
+            if (_instance->GetData(DATA_INSECT_SWARM_EVENT) != IN_PROGRESS)
+                return;
+
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                if (eventId == EVENT_SUMMON_INSECTS)
+                {
+                    if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 25.0f, true))
+                        SummonInsects(victim);
+
+                    _events.ScheduleEvent(EVENT_SUMMON_INSECTS, 3000);
+                }
+                else if (eventId == EVENT_CHECK_INSTANCE)
+                {
+                    if (_instance->GetData(DATA_INSECT_SWARM_EVENT) == DONE)
+                        return;
+
+                    bool HasInsectSwarm = false;
+                    Map::PlayerList const &PlList = me->GetMap()->GetPlayers();
+
+                    if (PlList.isEmpty())
+                    {
+                        DoAction(ACTION_FAIL_TRAP_EVENT);
+                        return;
+                    }
+
+                    for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
+                    {
+                        if (Player* player = i->GetSource())
+                        {
+                            if (player->HasAura(SPELL_GIANT_INSECT_SWARM))
+                                HasInsectSwarm = true;
+                        }
+                    }
+
+                    if (!HasInsectSwarm)
+                        DoAction(ACTION_FAIL_TRAP_EVENT);
+
+                    _events.ScheduleEvent(EVENT_CHECK_INSTANCE, 5000);
+                }
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            _summons.Summon(summon);
+            summon->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            _summons.Despawn(summon);
+        }
+
+        void SummonInsects(Unit* victim)
+        {
+            for (uint32 i = 0; i < 5; ++i)
+                if (Creature* insect = me->SummonCreature(NPC_FLESH_EATING_INSECT, victim->GetPositionX() + float(irand(-7, 7)), victim->GetPositionY() + float(irand(-7, 7)), victim->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))
+                    if (victim != me)
+                        insect->AI()->AttackStart(victim);
+
+        }
+
+        private:
+            EventMap _events;
+            InstanceScript* _instance;
+            SummonList _summons;
+    };
+
+    CreatureAI *GetAI(Creature* creature) const override
+    {
+        return new EC_npc_putricide_insect_trapAI(creature);
+    }
+};
 
 class EC_npc_flesh_eating_insect : public CreatureScript
 {
@@ -1756,6 +1913,7 @@ void AddSC_custom_scripts()
     new EC_npc_gen_movable_cannon_hack();
     new EC_spell_taunt_flag();
     new spell_gen_landmine_knockback();
+    new EC_npc_putricide_insect_trap();
     new EC_npc_flesh_eating_insect();
     new EC_spell_pri_prayer_of_mending();
     new EC_npc_null_vehicle();
