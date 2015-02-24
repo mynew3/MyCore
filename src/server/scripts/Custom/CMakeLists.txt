@@ -11,7 +11,6 @@
 # file(GLOB_RECURSE sources_Custom Custom/*.cpp Custom/*.h)
 
 set(scripts_STAT_SRCS
-  Custom/custom.cpp
   Custom/custom_scripts.cpp
   Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
   Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
