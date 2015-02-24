@@ -23,12 +23,6 @@
 #include "CellImpl.h"
 #include "obsidian_sanctum.h"
 
-enum eAchievements
-{
-   VOLCANO_BLOWS_10    = 2047,
-   VOLCANO_BLOWS_25    = 2048
-};
-
 enum Enums
 {
     //Sartharion Yell
@@ -79,7 +73,8 @@ enum Enums
 
 enum Misc
 {
-    DATA_CAN_LOOT           = 0
+    DATA_CAN_LOOT                        = 0,
+    DATA_GONNA_GO_WHEN_THE_VULCANO_BLOWS = 1
 };
 
 Position const FlameRight1Spawn     = { 3200.00f, 573.211f, 57.1551f, 0.0f };
@@ -141,8 +136,11 @@ public:
             Initialize();
         }
 
+        std::list<uint64> gonnagowhenthevulcanoblowsList;
+        
         void Initialize()
         {
+            gonnagowhenthevulcanoblowsList.clear();
             _isBerserk = false;
             _isSoftEnraged = false;
             _isHardEnraged = false;
@@ -188,7 +186,6 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_SARTHARION_DEATH);
-			instance->DoCompleteAchievement(RAID_MODE(VOLCANO_BLOWS_10,VOLCANO_BLOWS_25));
             _JustDied();
 
             if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TENEBRON)))
@@ -410,6 +407,12 @@ public:
 
             Trinity::Containers::SelectRandomContainerElement(fireCyclonesList)->CastSpell(target, SPELL_LAVA_STRIKE, true);
         }
+        
+        void SetGUID(ObjectGuid guid, int32 id/* = 0 */) override
+        {
+            if (id == DATA_GONNA_GO_WHEN_THE_VULCANO_BLOWS)
+                gonnagowhenthevulcanoblowsList.push_back(guid);
+        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -525,7 +528,64 @@ public:
     }
 };
 
+class spell_lava_strike : public SpellScriptLoader
+{
+    public:
+        spell_lava_strike() : SpellScriptLoader("spell_lava_strike") { }
+
+        class spell_lava_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_lava_strike_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* target = GetHitUnit();
+                InstanceScript* instance = target->GetInstanceScript();
+                if (instance)
+                {
+                    Creature* sartharion = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_SARTHARION));
+                    if (target->GetTypeId() == TYPEID_PLAYER && instance && sartharion)
+                        sartharion->GetAI()->SetGUID(target->GetGUID(), DATA_GONNA_GO_WHEN_THE_VULCANO_BLOWS);
+                }
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_lava_strike_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_lava_strike_SpellScript();
+        }
+};
+
+class achievement_gonna_go_when_the_vulcano_blows : public AchievementCriteriaScript
+{
+    public:
+        achievement_gonna_go_when_the_vulcano_blows() : AchievementCriteriaScript("achievement_gonna_go_when_the_vulcano_blows")
+        {
+        }
+
+        bool OnCheck(Player* player, Unit* target) override
+        {
+            if (!target)
+                return false;
+
+            std::list<uint64> gonnagowhenthevulcanoblowsList = CAST_AI(boss_sartharion::boss_sartharionAI, target->ToCreature()->AI())->gonnagowhenthevulcanoblowsList;
+            if (!gonnagowhenthevulcanoblowsList.empty())
+                for (std::list<uint64>::iterator itr = gonnagowhenthevulcanoblowsList.begin(); itr != gonnagowhenthevulcanoblowsList.end(); ++itr)
+                    if (player->GetGUID() == *itr)
+                        return false;
+
+            return true;
+        }
+};
+
 void AddSC_boss_sartharion()
 {
     new boss_sartharion();
+    new achievement_gonna_go_when_the_vulcano_blows();
+    new spell_lava_strike();
 }
