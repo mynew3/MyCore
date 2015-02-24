@@ -12,6 +12,8 @@
 
 set(scripts_STAT_SRCS
   Custom/custom_scripts.cpp
+  Custom/CustomEC/custom_spell.cpp
+  Custom/CustomEC/custom_quest.cpp
   Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
   Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
   Custom/TrialOfTheChampion/EC_boss_argent_challenge.cpp
