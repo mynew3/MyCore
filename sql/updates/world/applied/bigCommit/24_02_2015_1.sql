@@ -6,11 +6,11 @@ SET @E_REDEEM		:= 15628;
 
 DELETE FROM `creature_ai_scripts` WHERE creature_id=@ERANIKUS;
 -- Tyrande
-UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', flags_extra=0, type_flags=0, unit_flags=32768, faction_H=1254, faction_A=1254 WHERE entry=@TYRANDE;
+UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', flags_extra=0, type_flags=0, unit_flags=32768, faction=1254 WHERE entry=@TYRANDE;
 -- Eranikus, Tyrant of the Dream
-UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', InhabitType=7, faction_A=35, faction_H=35, unit_flags=0, flags_extra=2097152, type_flags=8, dynamicflags=128, speed_walk=2 WHERE entry=@ERANIKUS;
+UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', InhabitType=7, faction=35, unit_flags=0, flags_extra=2097152, type_flags=8, dynamicflags=128, speed_walk=2 WHERE entry=@ERANIKUS;
 -- Keeper Remulos
-UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', speed_walk=2.5, speed_run=3.75, type_flags=0, unit_flags=32768, faction_H=1254, faction_A=1254 WHERE entry=@REMULOS;
+UPDATE `creature_template` SET AIName='SmartAI', ScriptName='', speed_walk=2.5, speed_run=3.75, type_flags=0, unit_flags=32768, faction=1254 WHERE entry=@REMULOS;
 
 
 -- NPC texts
@@ -184,7 +184,7 @@ INSERT INTO `smart_scripts` VALUES
 (@E_REDEEM,0,5,0,52,0,100,0,3,@E_REDEEM,0,0,15,8736,0,0,0,0,0,18,30,0,0,0,0,0,0,'Eranikus the Redeemed - On Say 3 - Credit'),
 (@E_REDEEM,0,6,0,52,0,100,0,3,@E_REDEEM,0,0,45,1,1,0,0,0,0,11,@REMULOS,40,0,0,0,0,0,'Eranikus the Redeemed - On Say 3 - Set Data');
 
-UPDATE `creature_template` SET AIName='SmartAI', Faction_A=14, Faction_H=14 WHERE entry=@PHANTASM;
+UPDATE `creature_template` SET AIName='SmartAI', faction=14 WHERE entry=@PHANTASM;
 DELETE FROM `smart_scripts` WHERE entryorguid IN(@PHANTASM);
 INSERT INTO `smart_scripts` VALUES
 (@PHANTASM,0,0,0,54,0,100,0,0,0,0,0,53,1,@PHANTASM,0,8736,0,0,1,0,0,0,0,0,0,0,'Nightmare Phantasm - Summon - Start WayPoint'),

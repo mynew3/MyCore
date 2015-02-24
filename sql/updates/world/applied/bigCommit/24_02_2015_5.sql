@@ -4,7 +4,6 @@ SET @GOB_GUID := 400010; -- 1 needed
 UPDATE `item_template` SET `ScriptName` = 'EC_item_water_bucket' WHERE `entry` = 32971;
 UPDATE `creature_template` SET `ScriptName` = 'EC_npc_halloween_fire' WHERE `entry` = 23537;
 UPDATE `creature_template` SET `flags_extra`=130 WHERE `entry`=23686; -- fire dummies should be invisible
-UPDATE `creature_template` SET `Health_mod`=20 WHERE `entry`=23543; -- HH should have 4440 hp
 
 DELETE FROM `creature` WHERE `id` IN (23537,23686) AND `guid` BETWEEN @CREATURE_GUID+00 AND @CREATURE_GUID+10;
 INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
@@ -49,24 +48,6 @@ DELETE FROM `game_event_gameobject` WHERE `guid`=@GOB_GUID;
 INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 (12,@GOB_GUID);
 
-/*
-DELETE FROM `conditions` WHERE SourceTypeOrReferenceId IN (18,19) AND SourceEntry IN (11360, 11361, 11439, 11440, 11449, 11450, 12135, 11131, 12139, 11219);
-INSERT INTO `conditions` VALUES
--- Fire Brigade Practice (Alliance) Area dependance
-(18, 0, 11360, 0, 23, 87, 0, 0, 0, '', NULL),
-(19, 0, 11360, 0, 23, 87, 0, 0, 0, '', NULL),
-(18, 0, 11439, 0, 23, 131, 0, 0, 0, '', NULL),
-(19, 0, 11439, 0, 23, 131, 0, 0, 0, '', NULL),
-(18, 0, 11440, 0, 23, 3576, 0, 0, 0, '', NULL),
-(19, 0, 11440, 0, 23, 3576, 0, 0, 0, '', NULL),
--- Fire Training (Horde) Area dependance
-(18, 0, 11361, 0, 23, 362, 0, 0, 0, '', NULL),
-(19, 0, 11361, 0, 23, 362, 0, 0, 0, '', NULL),
-(18, 0, 11449, 0, 23, 85, 0, 0, 0, '', NULL),
-(19, 0, 11449, 0, 23, 85, 0, 0, 0, '', NULL),
-(18, 0, 11450, 0, 23, 3665, 0, 0, 0, '', NULL),
-(19, 0, 11450, 0, 23, 3665, 0, 0, 0, '', NULL);
-*/
 -- Fire Brigade Practice (Alliance) (Only 1 may be completed)
 UPDATE `quest_template` SET `ExclusiveGroup` = 11360, `NextQuestId`= 12135 WHERE `id` IN (11360, 11439, 11440);
 -- Fire Training (Horde) (Only 1 may be completed)

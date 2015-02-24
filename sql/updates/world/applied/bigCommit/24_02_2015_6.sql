@@ -45,7 +45,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (32820,0,0,0,6,0,100,0,0,0,0,0,85,62014,2,0,0,0,0,7,0,0,0,0,0,0,0,'On death - Cast Turkey Marker');
 
 -- Item: Turkey Caller
-UPDATE `creature_template` SET `faction_A`=35, `faction_H`=35, `ScriptName` = 'EC_npc_lonely_turkey' WHERE `entry` =32956; -- Lonely Turkey
+UPDATE `creature_template` SET `faction`=35, `ScriptName` = 'EC_npc_lonely_turkey' WHERE `entry` =32956; -- Lonely Turkey
 
 -- Achievement: The Turkinator
 DELETE FROM `spell_script_names` WHERE `ScriptName`='EC_spell_gen_turkey_tracker';
