@@ -82,43 +82,123 @@ void Eluna::OnChange(Weather* weather, uint32 zone, WeatherState state, float gr
 }
 
 // Auction House
-void Eluna::OnAdd(AuctionHouseObject* ah)
+void Eluna::OnAdd(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_ADD))
         return;
 
+    Player* owner = eObjectAccessor->FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
+#ifdef TRINITY
+    Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
+    uint32 expiretime = entry->expire_time;
+#else
+    Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
+    uint32 expiretime = entry->expireTime;
+#endif
+
+
+    if (!owner || !item)
+        return;
+
     LOCK_ELUNA;
-    Push(ah);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_ADD);
 }
 
-void Eluna::OnRemove(AuctionHouseObject* ah)
+void Eluna::OnRemove(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_REMOVE))
         return;
 
+    Player* owner = eObjectAccessor->FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
+#ifdef TRINITY
+    Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
+    uint32 expiretime = entry->expire_time;
+#else
+    Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
+    uint32 expiretime = entry->expireTime;
+#endif
+
+
+    if (!owner || !item)
+        return;
+
     LOCK_ELUNA;
-    Push(ah);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_REMOVE);
 }
 
-void Eluna::OnSuccessful(AuctionHouseObject* ah)
+void Eluna::OnSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_SUCCESSFUL))
         return;
 
+    Player* owner = eObjectAccessor->FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
+#ifdef TRINITY
+    Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
+    uint32 expiretime = entry->expire_time;
+#else
+    Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
+    uint32 expiretime = entry->expireTime;
+#endif
+
+
+    if (!owner || !item)
+        return;
+
     LOCK_ELUNA;
-    Push(ah);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_SUCCESSFUL);
 }
 
-void Eluna::OnExpire(AuctionHouseObject* ah)
+void Eluna::OnExpire(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
     if (!ServerEventBindings->HasEvents(AUCTION_EVENT_ON_EXPIRE))
         return;
 
+    Player* owner = eObjectAccessor->FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
+#ifdef TRINITY
+    Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
+    uint32 expiretime = entry->expire_time;
+#else
+    Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
+    uint32 expiretime = entry->expireTime;
+#endif
+
+
+    if (!owner || !item)
+        return;
+
     LOCK_ELUNA;
-    Push(ah);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, AUCTION_EVENT_ON_EXPIRE);
 }
 

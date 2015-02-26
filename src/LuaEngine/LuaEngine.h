@@ -41,6 +41,7 @@ typedef int Difficulty;
 
 struct AreaTriggerEntry;
 class AuctionHouseObject;
+struct AuctionEntry;
 #ifdef TRINITY
 class Battleground;
 typedef Battleground BattleGround;
@@ -442,10 +443,10 @@ public:
     void OnChange(Weather* weather, uint32 zone, WeatherState state, float grade);
 
     /* Auction House */
-    void OnAdd(AuctionHouseObject* auctionHouse);
-    void OnRemove(AuctionHouseObject* auctionHouse);
-    void OnSuccessful(AuctionHouseObject* auctionHouse);
-    void OnExpire(AuctionHouseObject* auctionHouse);
+    void OnAdd(AuctionHouseObject* ah, AuctionEntry* entry);
+    void OnRemove(AuctionHouseObject* ah, AuctionEntry* entry);
+    void OnSuccessful(AuctionHouseObject* ah, AuctionEntry* entry);
+    void OnExpire(AuctionHouseObject* ah, AuctionEntry* entry);
 
     /* Guild */
     void OnAddMember(Guild* guild, Player* player, uint32 plRank);
