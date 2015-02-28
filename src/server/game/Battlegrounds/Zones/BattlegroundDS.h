@@ -98,8 +98,6 @@ class BattlegroundDS : public Arena
         void StartingEventOpenDoors() override;
 
         void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
-        bool HandlePlayerUnderMap(Player* player);
- 		bool IsPlayerUnderMap(Player* player);
         bool SetupBattleground() override;
         void FillInitialWorldStates(WorldPacket &d) override;
 

@@ -386,7 +386,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
-        if (movementInfo.pos.GetPositionZ() < -500.0f || (plrMover->GetBattleground() && plrMover->GetBattleground()->IsPlayerUnderMap(_player)))
+        if (movementInfo.pos.GetPositionZ() < -500.0f)
         {
             if (!(plrMover->GetBattleground() && plrMover->GetBattleground()->HandlePlayerUnderMap(_player)))
             {
