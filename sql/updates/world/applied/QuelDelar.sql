@@ -11,3 +11,7 @@ SET @CGUID := 43498;
 DELETE FROM `creature` WHERE id=37527;
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `MovementType`) VALUES
 (@CGUID, 37527, 530, 1, 1, 12559.3, -6783.323, 15.06894, 0.06981317, 120, 0, 0);
+
+UPDATE `creature_template` SET `vehicleid`=60 WHERE `entry`=30159;
+UPDATE `smart_scripts` SET `action_param2`=0 WHERE `entryorguid`=31242 AND `source_type`=0 AND `id`=14;
+UPDATE `creature_template_addon` SET `mount`=0 WHERE `entry`=31242;
