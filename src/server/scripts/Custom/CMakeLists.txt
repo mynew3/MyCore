@@ -12,6 +12,7 @@
 
 set(scripts_STAT_SRCS
   Custom/custom.cpp
+  Custom/cs_custom.cpp
   Custom/CustomEC/custom_quest_spell_items.cpp
   Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
   Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
