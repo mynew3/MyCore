@@ -12,7 +12,6 @@
 
 set(scripts_STAT_SRCS
   Custom/custom.cpp
-  Custom/cs_custom.cpp
   Custom/CustomEC/custom_quest_spell_items.cpp
   Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
   Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
@@ -33,8 +32,6 @@ set(scripts_STAT_SRCS
   Custom/Transmog/Transmogrifier.cpp
   Custom/arena_fast_start.cpp
   Custom/GOMove/GOMove.cpp
-  Custom/Arena/npc_arena1v1.h
-  Custom/Arena/npc_arena1v1.cpp
   ${scripts_STAT_SRCS}
 # ${sources_Custom}
 )
