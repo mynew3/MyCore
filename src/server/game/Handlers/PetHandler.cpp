@@ -302,7 +302,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
             }
 
             // do not cast not learned spells
-            if (!pet->HasSpell(spellid) || spellInfo->IsPassive())
+            if (!pet->HasSpell(spellid) || !spellInfo->IsPassive())
                 return;
 
             //  Clear the flags as if owner clicked 'attack'. AI will reset them
