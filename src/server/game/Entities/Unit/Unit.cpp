@@ -2506,6 +2506,14 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
             return SPELL_MISS_BLOCK;
     }
 
+    // Check for immune
+    if (victim->IsImmunedToSpell(spellInfo))
+        return SPELL_MISS_IMMUNE;
+
+    // Check for immune
+    if (victim->IsImmunedToDamage(spellInfo))
+        return SPELL_MISS_IMMUNE;
+
     return SPELL_MISS_NONE;
 }
 
@@ -2603,6 +2611,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
             return SPELL_MISS_DEFLECT;
     }
 
+    // Check for immune
+    if (victim->IsImmunedToSpell(spellInfo))
+        return SPELL_MISS_IMMUNE;
+
+    // Check for immune
+    if (victim->IsImmunedToDamage(spellInfo))
+        return SPELL_MISS_IMMUNE;
+
     return SPELL_MISS_NONE;
 }
 
@@ -2616,18 +2632,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 //   Resist
 SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spellInfo, bool CanReflect)
 {
-    // Check for immune
-    if (victim->IsImmunedToSpell(spellInfo))
-        return SPELL_MISS_IMMUNE;
-
     // All positive spells can`t miss
     /// @todo client not show miss log for this spells - so need find info for this in dbc and use it!
     if (spellInfo->IsPositive() && !IsHostileTo(victim)) // prevent from affecting enemy by "positive" spell
         return SPELL_MISS_NONE;
-
-    // Check for immune
-    if (victim->IsImmunedToDamage(spellInfo))
-        return SPELL_MISS_IMMUNE;
 
     if (this == victim)
         return SPELL_MISS_NONE;
@@ -2662,6 +2670,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spellInfo, boo
         case SPELL_DAMAGE_CLASS_MAGIC:
             return MagicSpellHitResult(victim, spellInfo);
     }
+
     return SPELL_MISS_NONE;
 }
 
