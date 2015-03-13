@@ -32,6 +32,7 @@ set(scripts_STAT_SRCS
   Custom/Transmog/Transmogrifier.cpp
   Custom/arena_fast_start.cpp
   Custom/GOMove/GOMove.cpp
+  Custom/npc_promo.cpp
   ${scripts_STAT_SRCS}
 # ${sources_Custom}
 )
