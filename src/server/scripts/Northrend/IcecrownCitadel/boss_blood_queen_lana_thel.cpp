@@ -67,7 +67,10 @@ enum Spells
     SPELL_ANNIHILATE                        = 71322,
 
     // Blood Infusion
-    SPELL_BLOOD_INFUSION_CREDIT             = 72934
+    SPELL_BLOOD_INFUSION_CREDIT             = 72934,
+
+	SPELL_UNCONTROLLABLE_FRENZY_1 = 70924,
+	SPELL_UNCONTROLLABLE_FRENZY_2 = 73015
 };
 
 enum Shadowmourne
@@ -884,10 +887,58 @@ class achievement_once_bitten_twice_shy_v : public AchievementCriteriaScript
         }
 };
 
+class spell_blood_queen_uncontrollable_frenzy : public SpellScriptLoader
+{
+public:
+	spell_blood_queen_uncontrollable_frenzy() : SpellScriptLoader("spell_blood_queen_uncontrollable_frenzy") { }
+
+	class spell_blood_queen_uncontrollable_frenzy_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_blood_queen_uncontrollable_frenzy_AuraScript);
+
+		void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+		{
+			if (!GetTarget())
+				return;
+
+			bool valid = false;
+
+			if (InstanceScript* instance = GetTarget()->GetInstanceScript())
+			{
+				if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == IN_PROGRESS)
+				{
+					if (GetTarget()->GetCharmerGUID() == instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL))
+					{
+						valid = true;
+					}
+				}
+			}
+
+			if (!valid)
+			{
+				GetTarget()->RemoveAurasDueToSpell(SPELL_UNCONTROLLABLE_FRENZY);
+				GetTarget()->RemoveAurasDueToSpell(SPELL_UNCONTROLLABLE_FRENZY_1);
+				GetTarget()->RemoveAurasDueToSpell(SPELL_UNCONTROLLABLE_FRENZY_2);
+			}
+		}
+
+		void Register()
+		{
+			AfterEffectApply += AuraEffectApplyFn(spell_blood_queen_uncontrollable_frenzy_AuraScript::AfterApply, EFFECT_0, SPELL_AURA_MECHANIC_IMMUNITY_MASK, AURA_EFFECT_HANDLE_REAL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_blood_queen_uncontrollable_frenzy_AuraScript();
+	}
+};
+
 void AddSC_boss_blood_queen_lana_thel()
 {
     new boss_blood_queen_lana_thel();
-    new spell_blood_queen_vampiric_bite();
+    new spell_blood_queen_vampiric_bite(); 
+	new spell_blood_queen_uncontrollable_frenzy();
     new spell_blood_queen_frenzied_bloodthirst();
     new spell_blood_queen_bloodbolt();
     new spell_blood_queen_essence_of_the_blood_queen();
