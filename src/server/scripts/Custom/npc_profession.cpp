@@ -145,7 +145,8 @@ bool OnGossipSelect(Player* pPlayer, Creature* _creature, uint32 uiSender, uint3
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Misc_Herb_07:30|t Травничество.", GOSSIP_SENDER_MAIN, 9);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\inv_misc_pelt_wolf_01:30|t Снятие шкур.", GOSSIP_SENDER_MAIN, 10);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\trade_mining:30|t Горное дело.", GOSSIP_SENDER_MAIN, 11);
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:30|t Кулинария.", GOSSIP_SENDER_MAIN, 12);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\Icons\\INV_Misc_Food_15:30|t Кулинария.", GOSSIP_SENDER_MAIN, 12);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\Icons\\Trade_Tailoring:30|t Первая помощь.", GOSSIP_SENDER_MAIN, 13);
                 pPlayer->PlayerTalkClass->SendGossipMenu(1, _creature->GetGUID());
                 break;
         case 1:
@@ -269,6 +270,17 @@ bool OnGossipSelect(Player* pPlayer, Creature* _creature, uint32 uiSender, uint3
                 CompleteLearnProfession(pPlayer, _creature, SKILL_COOKING);
                 pPlayer->PlayerTalkClass->SendCloseGossip();
                 break;
+				
+        case 13:
+                if(pPlayer->HasSkill(SKILL_FIRST_AID))
+                {
+                        pPlayer->PlayerTalkClass->SendCloseGossip();
+                        break;
+                }
+               
+                CompleteLearnProfession(pPlayer, _creature, SKILL_FIRST_AID);
+                pPlayer->PlayerTalkClass->SendCloseGossip();
+                break;				
 }              
     }
                             return true;
