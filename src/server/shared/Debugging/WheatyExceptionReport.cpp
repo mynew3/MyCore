@@ -1068,7 +1068,7 @@ bool logChildren)
                 {
                     case btChar:
                     case btStdString:
-                        FormatOutputValue(buffer, basicType, length, (PVOID)offset, sizeof(buffer), elementsCount);
+                        FormatOutputValue(buffer, basicType, length, (PVOID)offset, sizeof(buffer));
                         symbolDetails.top().Value = buffer;
                         break;
                     default:
@@ -1196,8 +1196,7 @@ void WheatyExceptionReport::FormatOutputValue(char * pszCurrBuffer,
 BasicType basicType,
 DWORD64 length,
 PVOID pAddress,
-size_t bufferSize,
-size_t countOverride)
+size_t bufferSize)
 {
     __try
     {
@@ -1205,15 +1204,10 @@ size_t countOverride)
         {
             case btChar:
             {
-                // Special case handling for char[] type
-                if (countOverride != 0)
-                    length = countOverride;
-                else
-                    length = strlen((char*)pAddress);
-                if (length > bufferSize - 6)
+                if (strlen((char*)pAddress) > bufferSize - 6)
                     pszCurrBuffer += sprintf(pszCurrBuffer, "\"%.*s...\"", bufferSize - 6, (char*)pAddress);
                 else
-                    pszCurrBuffer += sprintf(pszCurrBuffer, "\"%.*s\"", length, (char*)pAddress);
+                    pszCurrBuffer += sprintf(pszCurrBuffer, "\"%s\"", (char*)pAddress);
                 break;
             }
             case btStdString:
