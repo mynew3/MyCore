@@ -4669,6 +4669,24 @@ SpellCastResult Spell::CheckCast(bool strict)
         m_customError = SPELL_CUSTOM_ERROR_GM_ONLY;
         return SPELL_FAILED_CUSTOM_ERROR;
     }
+    
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+       if (m_caster->HasAura(16870) && (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[0] & 0x00008000 && m_spellInfo->SpellIconID == 147)) // Clearcasting (Druid) and spell Shred
+       {
+           if (Unit* victim = m_targets.GetUnitTarget())
+           {
+              if (victim != m_caster)
+              {
+                if (victim->HasInArc(static_cast<float>(M_PI), m_caster)) // Check is in front
+                {
+                   m_caster->ToPlayer()->RestoreSpellMods(this, 16870); // Restore charges
+                   return SPELL_FAILED_NOT_BEHIND;
+                }
+              }
+           }
+       }
+    }
 
     // Check global cooldown
     if (strict && !(_triggeredCastFlags & TRIGGERED_IGNORE_GCD) && HasGlobalCooldown())
