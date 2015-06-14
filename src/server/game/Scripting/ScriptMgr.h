@@ -772,6 +772,9 @@ class PlayerScript : public UnitScript
 
         // Called after a player's quest status has been changed
         virtual void OnQuestStatusChange(Player* /*player*/, uint32 /*questId*/, QuestStatus /*status*/) { }
+		
+		// Called on every player time total/level
+        virtual void OnTime(Player* /*player*/, uint32 /*total*/, uint32 /*level*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1089,6 +1092,7 @@ class ScriptMgr
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
         void OnQuestStatusChange(Player* player, uint32 questId, QuestStatus status);
+		void OnPlayerTime(Player* player, uint32 total, uint32 level);
 
     public: /* AccountScript */
 

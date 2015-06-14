@@ -33,6 +33,7 @@ set(scripts_STAT_SRCS
   Custom/arena_fast_start.cpp
   Custom/GOMove/GOMove.cpp
   Custom/npc_promo.cpp
+  Custom/awards_for_time.cpp
   ${scripts_STAT_SRCS}
 # ${sources_Custom}
 )

@@ -1575,6 +1575,11 @@ void ScriptMgr::OnQuestStatusChange(Player* player, uint32 questId, QuestStatus 
     FOREACH_SCRIPT(PlayerScript)->OnQuestStatusChange(player, questId, status);
 }
 
+void ScriptMgr::OnPlayerTime(Player* player, uint32 total, uint32 level)
+{
+	FOREACH_SCRIPT(PlayerScript)->OnTime(player, total, level);
+}
+
 // Account
 void ScriptMgr::OnAccountLogin(uint32 accountId)
 {

@@ -1328,6 +1328,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600) * IN_MILLISECONDS;
     m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
 
+	// Awards Per Time
+	m_bool_configs[CONFIG_AWARDS_PER_TIME] = sConfigMgr->GetBoolDefault("player.awards.per.time", false);
+	
     // call ScriptMgr if we're reloading the configuration
     if (reload)
         sScriptMgr->OnConfigLoad(reload);
