@@ -8617,7 +8617,11 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
 
     // item spells cast at use
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-    {
+    {		
+        // item can be deleted in Spell::TakeCastItem
+        if (!item)
+            break;
+		
         _Spell const& spellData = proto->Spells[i];
 
         // no spell
@@ -8640,13 +8644,19 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         spell->m_cast_count = cast_count;                   // set count of casts
         spell->m_glyphIndex = glyphIndex;                   // glyph index
         spell->prepare(&targets);
-
+		
+        if (!spell->m_CastItem)
+            item = nullptr;
+		
         ++count;
     }
 
     // Item enchantments spells cast at use
     for (uint8 e_slot = 0; e_slot < MAX_ENCHANTMENT_SLOT; ++e_slot)
     {
+        // item can be deleted in Spell::TakeCastItem
+        if (!item)
+            break;
         uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(e_slot));
         SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
         if (!pEnchant)
@@ -8668,6 +8678,9 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             spell->m_cast_count = cast_count;               // set count of casts
             spell->m_glyphIndex = glyphIndex;               // glyph index
             spell->prepare(&targets);
+			
+            if (!spell->m_CastItem)
+                item = nullptr;
 
             ++count;
         }
@@ -23387,7 +23400,7 @@ void Player::LearnCustomSpells()
         return;
 
     // learn default race/class spells
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     for (PlayerCreateInfoSpells::const_iterator itr = info->customSpells.begin(); itr != info->customSpells.end(); ++itr)
     {
         uint32 tspell = *itr;
