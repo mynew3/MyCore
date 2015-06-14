@@ -368,6 +368,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             DemolisherStartState(false);
             Status = BG_SA_ROUND_TWO;
             StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, (Attackers == TEAM_ALLIANCE) ? 23748 : 21702);
+			_gateDestroyed = false;
             // status was set to STATUS_WAIT_JOIN manually for Preparation, set it back now
             SetStatus(STATUS_IN_PROGRESS);
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
@@ -1022,7 +1023,7 @@ bool BattlegroundSA::CheckAchievementCriteriaMeet(uint32 criteriaId, Player cons
         case BG_CRITERIA_CHECK_NOT_EVEN_A_SCRATCH:
             return _allVehiclesAlive[GetTeamIndexByTeamId(source->GetTeam())];
         case BG_CRITERIA_CHECK_DEFENSE_OF_THE_ANCIENTS:
-            return source->GetTeamId() != Attackers && !_gateDestroyed;
+            return source->GetTeamId() == Attackers && !_gateDestroyed;
     }
 
     return Battleground::CheckAchievementCriteriaMeet(criteriaId, source, target, miscValue);
