@@ -440,8 +440,8 @@ class npc_highlord_tirion_fordring_lh : public CreatureScript
                         _events.ScheduleEvent(EVENT_LK_INTRO_2, 58000);
                         _events.ScheduleEvent(EVENT_LK_INTRO_3, 74000);
                         _events.ScheduleEvent(EVENT_LK_INTRO_4, 86000);
-                        _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 100000);
-                        _events.ScheduleEvent(EVENT_LK_INTRO_5, 108000);
+                        _events.ScheduleEvent(EVENT_BOLVAR_INTRO_1, 107000);
+                        _events.ScheduleEvent(EVENT_LK_INTRO_5, 115000);
 
                         if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
                         {
