@@ -203,8 +203,6 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
         {
             if (Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId))
             {
-
-                // Show queue status to player only (when joining queue)
                 if (sWorld->getBoolConfig(BATTLEGROUND_CROSSFACTION_ENABLED))
                 {
                     char const* bgName = bg->GetName().c_str();
@@ -256,8 +254,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
                             qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
                     }
                 }
-            }
-        }
+            }        }
         //release mutex
     }
 
