@@ -19305,7 +19305,12 @@ bool Player::CheckInstanceLoginValid()
         if (!GetGroup() && GetMap()->GetPlayersCountExceptGMs() > 1)
             return false;
     }
-
+    
+    if (GetMap()->GetPlayersCountExceptGMs() > ((InstanceMap*)GetMap())->GetMaxPlayers())
+    {
+        SendTransferAborted(GetMap()->GetId(), TRANSFER_ABORT_MAX_PLAYERS);
+        return false;
+    }
     // do checks for satisfy accessreqs, instance full, encounter in progress (raid), perm bind group != perm bind player
     return sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, true);
 }

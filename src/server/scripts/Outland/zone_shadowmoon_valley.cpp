@@ -670,8 +670,11 @@ class npc_karynaku : public CreatureScript
                 player->ActivateTaxiPathTo(TAXI_PATH_ID);
 
             if (quest->GetQuestId() == QUEST_ZUHULED_THE_WACK)
+            {
+                if (creature->FindNearestCreature(NPC_ZUHULED_THE_WACKED, 75.0f, true))
+                    return false;
                 creature->SummonCreature(NPC_ZUHULED_THE_WACKED, -4204.94f, 316.397f, 122.508f, 1.309f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
-
+            }
             return true;
         }
 };
