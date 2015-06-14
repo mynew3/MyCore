@@ -310,7 +310,6 @@ public:
             PlayerGUID.Clear();
             checkPlayerTimer = 1000;
             EventOnWait = false;
-			me->SetDisplayId(16622);
         }
 
         uint8 Step;
