@@ -29,6 +29,8 @@
 #include "ArenaTeamMgr.h"
 #include "Opcodes.h"
 
+#include "Chat.h"
+
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "MSG_INSPECT_ARENA_TEAMS");
@@ -154,6 +156,10 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, arenaTeam->GetName(), "", ERR_ARENA_TEAM_TOO_MANY_MEMBERS_S);
         return;
     }
+    
+    std::string arenaTeamName = arenaTeam->GetName();
+    if (!ChatHandler(this).isValidChatMessage(arenaTeamName.c_str()))
+        return;
 
     TC_LOG_DEBUG("bg.battleground", "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
 

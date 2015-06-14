@@ -1088,6 +1088,9 @@ class WorldSession
         ObjectGuid m_currentBankerGUID;
  		uint32 m_uiAntispamMailSentCount;
         uint32 m_uiAntispamMailSentTimer;
+        time_t timerGsSpam;
+        time_t timerWhoOpcode;
+        uint32 countWhoOpcode;
 
 
         WorldSession(WorldSession const& right) = delete;

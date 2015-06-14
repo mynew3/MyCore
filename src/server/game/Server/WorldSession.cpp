@@ -130,7 +130,10 @@ WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, Account
     m_currentBankerGUID(),
     countWhoOpcode(0),
  	m_uiAntispamMailSentCount(0), 
- 	m_uiAntispamMailSentTimer(0)
+ 	m_uiAntispamMailSentTimer(0),
+ 	timerGsSpam(0),
+    timerWhoOpcode(0),
+    countWhoOpcode(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 

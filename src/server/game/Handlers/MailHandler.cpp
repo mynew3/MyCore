@@ -28,6 +28,7 @@
 #include "DBCStores.h"
 #include "Item.h"
 #include "AccountMgr.h"
+#include "Chat.h"
 
 bool WorldSession::CanOpenMailBox(ObjectGuid guid)
 {
@@ -218,7 +219,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         SendNotification(GetTrinityString(LANG_MAIL_RECEIVER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
-
+    
+    if (!ChatHandler(this).isValidChatMessage(subject.c_str()) || !ChatHandler(this).isValidChatMessage(body.c_str()))
+        return;
     Item* items[MAX_MAIL_ITEMS];
 
     for (uint8 i = 0; i < items_count; ++i)

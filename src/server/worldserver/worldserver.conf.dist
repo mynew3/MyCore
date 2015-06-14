@@ -1437,7 +1437,7 @@ ListenRange.Yell = 300
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-ChatFakeMessagePreventing = 0
+ChatFakeMessagePreventing = 1
 
 #
 #    ChatStrictLinkChecking.Severity
@@ -1450,7 +1450,7 @@ ChatFakeMessagePreventing = 0
 #                         work correctly, please assure that you have extracted locale DBCs of
 #                         every language specific client playing on this server)
 
-ChatStrictLinkChecking.Severity = 0
+ChatStrictLinkChecking.Severity = 3
 
 #
 #    ChatStrictLinkChecking.Kick
