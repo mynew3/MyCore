@@ -205,36 +205,36 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     uint32 flags, time;
     recvData >> flags >> time;
 
-    Player* plMover = _player->m_mover->ToPlayer();
+    Player* plrMover = _player->m_mover->ToPlayer();
 
-    if (!plMover || !plMover->IsBeingTeleportedNear())
+    if (!plrMover || !plrMover->IsBeingTeleportedNear())
         return;
 
-    if (guid != plMover->GetGUID())
+    if (guid != plrMover->GetGUID())
         return;
 
-    plMover->SetSemaphoreTeleportNear(false);
+    plrMover->SetSemaphoreTeleportNear(false);
 
-    uint32 old_zone = plMover->GetZoneId();
+    uint32 old_zone = plrMover->GetZoneId();
 
-    WorldLocation const& dest = plMover->GetTeleportDest();
+    WorldLocation const& dest = plrMover->GetTeleportDest();
 
-    plMover->UpdatePosition(dest, true);
+    plrMover->UpdatePosition(dest, true);
 
     uint32 newzone, newarea;
-    plMover->GetZoneAndAreaId(newzone, newarea);
-    plMover->UpdateZone(newzone, newarea);
+    plrMover->GetZoneAndAreaId(newzone, newarea);
+    plrMover->UpdateZone(newzone, newarea);
 
     // new zone
     if (old_zone != newzone)
     {
         // honorless target
-        if (plMover->pvpInfo.IsHostile)
-            plMover->CastSpell(plMover, 2479, true);
+        if (plrMover->pvpInfo.IsHostile)
+            plrMover->CastSpell(plrMover, 2479, true);
 
         // in friendly area
-        else if (plMover->IsPvP() && !plMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
-            plMover->UpdatePvP(false, false);
+        else if (plrMover->IsPvP() && !plrMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+            plrMover->UpdatePvP(false, false);
     }
 
     // resummon pet
@@ -343,6 +343,139 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     uint32 mstime = getMSTime();
     /*----------------------*/
+
+	 
+    // ANTICHEAT CHECKS
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
+    {
+        /* Hack Detection doesn't work if:
+        *  player is in flight/transport
+        *  player is teleporting
+        *  when can't free move
+        */
+
+        if (plrMover && 
+            !plrMover->IsInFlight() && 
+            !plrMover->GetTransport() &&
+            !plrMover->IsBeingTeleported() &&
+            plrMover->CanFreeMove() &&
+            !plrMover->IsGameMaster())
+        {
+            // fly hack detection
+            // PosZ is checked to see if the player is going up when it should not.
+			// we need a better way :(
+            if (plrMover->CanFlyAnticheat(movementInfo))
+            {
+                if (movementInfo.pos.GetPositionZ() > plrMover->GetPositionZ() && fabs(movementInfo.pos.GetPositionZ() - plrMover->GetPositionZ()) > 1.5f)
+                {
+                    float ground_Z = plrMover->GetMap()->GetHeight(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ());
+                    if (movementInfo.pos.GetPositionZ() > ground_Z && fabs(movementInfo.pos.GetPositionZ() - ground_Z) >= 5.0f)
+                        plrMover->ElaborateCheatReport(plrMover,2);
+                }
+            }
+
+			// speed hack detection
+            if (plrMover->GetLastPacketTime() > 0 && 
+                movementInfo.GetMovementFlags() == plrMover->GetUnitMovementFlags() &&
+                opcode == MSG_MOVE_HEARTBEAT && 
+                plrMover->GetLastOpcode() == opcode &&
+                !plrMover->GetVehicle() && 
+				plrMover->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+            {
+                uint8 uiMoveType = 0;
+
+                if (plrMover->IsFlying())
+                    uiMoveType = MOVE_FLIGHT;
+                else if (plrMover->IsUnderWater())
+                    uiMoveType = MOVE_SWIM;
+				else if (plrMover->HasUnitMovementFlag(MOVEMENTFLAG_WALKING))
+					uiMoveType = MOVE_WALK;
+                else 
+                    uiMoveType = MOVE_RUN;
+
+                // this is the distance doable by a player in 1000 ms.
+                float fSpeedRate = plrMover->GetSpeedRate(UnitMoveType(uiMoveType));
+
+                // in my opinion this var must be constant in each check to avoid false reports
+                if (plrMover->GetLastSpeedRate() == fSpeedRate)
+                {
+                    // Calculate Distance2D
+                    float fDeltaX = pow((movementInfo.pos.GetPositionX() - plrMover->GetPositionX()),2);
+                    float fDeltaY = pow((movementInfo.pos.GetPositionY() - plrMover->GetPositionY()),2);
+                    // final distance
+                    float fDistance2d = fabs(sqrt(fDeltaX + fDeltaY) - plrMover->GetObjectSize() - plrMover->GetObjectSize());
+
+                    // time between packets
+                    uint32 uiDiffTime =  getMSTimeDiff(plrMover->GetLastPacketTime(), movementInfo.time);
+                    
+                    // this is the distance doable by the player in 1 sec using the time between the packets
+                    float fCoreDistance = uiDiffTime * 7.0f * fSpeedRate / 1000;
+
+                    /* SPEED HACK DETECTION */
+                    if (uiDiffTime < sWorld->getIntConfig(CONFIG_ANTICHEAT_MAX_DIFF_TIME) && uiDiffTime > sWorld->getIntConfig(CONFIG_ANTICHEAT_MIN_DIFF_TIME))
+                    {
+                        // some times (i dont know why) fCoreDistance is 0 test fCoreDistance is 0.8
+                        if (fCoreDistance > 0.0f && fDistance2d > 0)
+                        {
+                            if (fDistance2d > fCoreDistance)
+                            {
+                                if (fabs(fCoreDistance - fDistance2d) > sWorld->getFloatConfig(CONFIG_ANTICHEAT_MAX_DISTANCE_DIFF_ALLOWED))
+                                {
+                                    TC_LOG_INFO("server.worldserver", "Cheater! guid %u name %s fCoreDistance %f fDistance2d %f uiDiffTime %u fSpeedRate %f Latency %u",plrMover->GetGUIDLow(),plrMover->GetName().c_str(),fCoreDistance,fDistance2d,uiDiffTime,fSpeedRate, plrMover->GetSession()->GetLatency());
+                                    plrMover->ElaborateCheatReport(plrMover,1);
+                                }
+                            }
+                        }
+                    }
+                }
+			}
+			// just to prevent false reports when we switch (off/on) for example the aura or something.
+            if (movementInfo.GetMovementFlags() == plrMover->GetUnitMovementFlags())
+            {
+                // walk on water hack detection
+                // AFAIK the player can only do this if has some aura that allows it...
+				/*
+                if (!plrMover->HasAuraType(SPELL_AURA_WATER_WALK) &&
+					!plrMover->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
+					!plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) &&
+					!plrMover->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) &&
+                    plrMover->HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))
+                {
+					TC_LOG_INFO("server.worldserver", "Cheater! guid %u name %s Latency %u", plrMover->GetGUIDLow(), plrMover->GetName().c_str(), plrMover->GetSession()->GetLatency());
+                   plrMover->ElaborateCheatReport(plrMover,3);
+                }*/
+
+                // walk on water hack detection
+                // AFAIK the player can only do this if has some aura that allows it...
+                if (plrMover->IsFlying() &&
+                    !plrMover->HasAuraType(SPELL_AURA_FLY)
+                    && !plrMover->GetVehicle())
+                {
+					TC_LOG_INFO("server.worldserver", "Cheater! guid %u name %s Latency %u", plrMover->GetGUIDLow(), plrMover->GetName().c_str(), plrMover->GetSession()->GetLatency());
+                    plrMover->ElaborateCheatReport(plrMover,2);
+                }
+
+            }
+        }
+
+        // save packet time for next control.
+        if (plrMover)
+        {
+            uint8 uiMoveType = 0;
+
+            if (plrMover->IsFlying())
+                uiMoveType = MOVE_FLIGHT;
+            else if (plrMover->IsUnderWater())
+                uiMoveType = MOVE_SWIM;
+            else 
+                uiMoveType = MOVE_RUN;
+
+            plrMover->SetLastPacketTime(movementInfo.time);
+            plrMover->SetLastSpeedRate(plrMover->GetSpeedRate(UnitMoveType(uiMoveType)));
+            plrMover->SetLastOpcode(opcode);
+        }
+    }
+
     if (m_clientTimeDelay == 0)
         m_clientTimeDelay = mstime - movementInfo.time;
 
