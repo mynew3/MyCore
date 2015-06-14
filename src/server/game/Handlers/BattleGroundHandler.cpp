@@ -179,6 +179,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             return;
         }
 
+        // check Freeze debuff
+        if (_player->HasAura(9454))
+            return;
+
         BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
         GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, NULL, bgTypeId, bracketEntry, 0, false, isPremade, 0, 0);
@@ -435,6 +439,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     WorldPacket data;
     if (action)
     {
+        // check Freeze debuff
+        if (_player->HasAura(9454))
+            return;
+
         if (!_player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
             return;                                 // cheating?
 
