@@ -1190,6 +1190,8 @@ enum TrinityStrings
     LANG_INVALID_REALMID                = 11001,
 	LANG_WG_ANNOUNCE_WORLD              = 20200,
 	LANG_WG_ANNOUNCE15_WORLD            = 20201,
+	 //Antispam Locales (reserved: 13100)
+    LANG_ANTISPAM_ERROR                     = 13100,
 
     // Show Kick in world
     LANG_COMMAND_KICKMESSAGE_WORLD = 11002,

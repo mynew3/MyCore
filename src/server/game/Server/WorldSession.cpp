@@ -127,7 +127,10 @@ WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, Account
     _RBACData(NULL),
     expireTime(60000), // 1 min after socket loss, session is deleted
     forceExit(false),
-    m_currentBankerGUID()
+    m_currentBankerGUID(),
+    countWhoOpcode(0),
+ 	m_uiAntispamMailSentCount(0), 
+ 	m_uiAntispamMailSentTimer(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -267,6 +270,10 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+	/// Antispam Timer update
+    if (sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+        UpdateAntispamTimer(diff);
+	
     /// Update Timeout timer.
     UpdateTimeOutTime(diff);
 

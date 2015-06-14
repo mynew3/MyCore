@@ -3570,3 +3570,22 @@ Transmogrification.SetCopperCost = 0
 
 #
 ###################################################################################################
+###################################################################################################
+# Antispam Settings Mail
+# 
+# 
+#    Antispam enable
+#        Default:    0
+
+Antispam.Mail.Enabled = 0
+
+#    Timer is in seconds 
+#        Default:    3600
+
+Antispam.Mail.Timer = 3600
+#
+#    Antispam mail count
+#        Default:    10
+ 
+Antispam.Mail.Count = 10
+###################################################################################################

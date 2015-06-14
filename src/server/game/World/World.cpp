@@ -1323,6 +1323,10 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
+	
+	m_bool_configs[CONFIG_ANTISPAM_ENABLED] = sConfigMgr->GetBoolDefault("Antispam.Mail.Enabled", false);
+    m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = sConfigMgr->GetIntDefault("Antispam.Mail.Timer", 3600) * IN_MILLISECONDS;
+    m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = sConfigMgr->GetIntDefault("Antispam.Mail.Count", 10);
 
     // call ScriptMgr if we're reloading the configuration
     if (reload)

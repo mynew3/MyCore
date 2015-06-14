@@ -270,7 +270,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
         items[i] = item;
     }
-
+    // Check for spamming
+    if (!UpdateAntispamCount())
+    {
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        SendNotification(GetTrinityString(LANG_ANTISPAM_ERROR));
+        return;
+    }
+	
     player->SendMailResult(0, MAIL_SEND, MAIL_OK);
 
     player->ModifyMoney(-int32(reqmoney));
