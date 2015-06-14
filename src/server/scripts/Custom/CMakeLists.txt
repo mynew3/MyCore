@@ -11,6 +11,7 @@
 # file(GLOB_RECURSE sources_Custom Custom/*.cpp Custom/*.h)
 
 set(scripts_STAT_SRCS
+  ${scripts_STAT_SRCS}
   Custom/custom.cpp
   Custom/CustomEC/custom_quest_spell_items.cpp
   Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
@@ -34,7 +35,7 @@ set(scripts_STAT_SRCS
   Custom/GOMove/GOMove.cpp
   Custom/npc_promo.cpp
   Custom/awards_for_time.cpp
-  ${scripts_STAT_SRCS}
+  Custom/chat_censure.cpp
 # ${sources_Custom}
 )
 
