@@ -211,7 +211,9 @@ enum WintergraspNpcs
     NPC_WINTERGRASP_SIEGE_ENGINE_HORDE              = 32627,
     NPC_WINTERGRASP_CATAPULT                        = 27881,
     NPC_WINTERGRASP_DEMOLISHER                      = 28094,
-    NPC_WINTERGRASP_TOWER_CANNON                    = 28366
+    NPC_WINTERGRASP_TOWER_CANNON                    = 28366,
+
+    QUEST_WINTERGRASP_SOUTHERN_TOWER_KILL           = 35074
 };
 
 struct BfWGCoordGY
