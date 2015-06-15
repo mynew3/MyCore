@@ -47,32 +47,33 @@ public:
 			
 		switch (total)
 		{
-			case 7200: // 2 hours
-				player->ModifyMoney(5000000);
-				ChatHandler(player->GetSession()).SendSysMessage("Сообщение");
+			case 3600: // 1 hours
+				player->AddItem(49912, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
-			case 14400: // 4 hours
-				player->AddItem(49426, 35);
-				ChatHandler(player->GetSession()).SendSysMessage("Сообщение");
+			case 10800: // 3 hours
+				player->AddItem(20558, 40);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
-			case 28800: // 8 hours
-				player->ModifyHonorPoints(500); // 500 Honor Points
-				player->ModifyArenaPoints(250); // 250 arena points
-				ChatHandler(player->GetSession()).SendSysMessage("Сообщение");
+			case 21600: // 6 hours
+				player->AddItem(38186, 100);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
-			case 57600: // 16 hours
-				// Максимум 12 вещей!
-				// mailItems.push_back(ItemPair(Ид вещи, кол-во));
-				mailItems.push_back(ItemPair(5133, 3));
-				SendMail(player, "Заголовок письма", "Содержание письма");
-				ChatHandler(player->GetSession()).SendSysMessage("Сообщение");
+			case 43200: // 12 hours
+				player->AddItem(37719, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
+			case 86400: // 24 hours
+				player->AddItem(54860, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+/*				
 			case 115200: // 32 hours
 				mailItems.push_back(ItemPair(5133, 1));
 				mailItems.push_back(ItemPair(5133, 3));
 				mailItems.push_back(ItemPair(5133, 5));
 				SendMail(player, "Заголовок письма", "Содержание письма", 5000000); // Send Items +500 gold
 				ChatHandler(player->GetSession()).SendSysMessage("Сообщение");
+*/
 				break;
 			default:
 				break;
