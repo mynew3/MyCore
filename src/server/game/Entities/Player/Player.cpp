@@ -5769,9 +5769,10 @@ void Player::RepopAtGraveyard()
     // for example from WorldSession::HandleMovementOpcodes
 
     AreaTableEntry const* zone = GetAreaEntryByAreaID(GetAreaId());
+    float groundZ = GetMap()->GetWaterOrGroundLevel(GetPositionX(), GetPositionY(), MAX_HEIGHT);
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
-    if ((!IsAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < -500.0f)
+    if ((!IsAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < (groundZ - 150.0f))
     {
         ResurrectPlayer(0.5f);
         SpawnCorpseBones();
@@ -5808,7 +5809,7 @@ void Player::RepopAtGraveyard()
             GetSession()->SendPacket(&data);
         }
     }
-    else if (GetPositionZ() < -500.0f)
+    else if (GetPositionZ() < (groundZ - 150.0f))
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
 }
 
