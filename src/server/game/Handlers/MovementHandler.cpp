@@ -528,7 +528,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         float groundZ = plrMover->GetMap()->GetWaterOrGroundLevel(plrMover->GetPositionX(), plrMover->GetPositionY(), MAX_HEIGHT);
 
-        if (movementInfo.pos.GetPositionZ() < (groundZ - 150.0f))
+        if (movementInfo.pos.GetPositionZ() < (groundZ - 600.0f))
         {
            if (underMapValueZ != -500) // Only Case Values
            {
