@@ -137,8 +137,8 @@ bool OnGossipSelect(Player* pPlayer, Creature* _creature, uint32 uiSender, uint3
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\trade_alchemy:30|t Алхимия.", GOSSIP_SENDER_MAIN, 1);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Ingot_05:30|t Кузнечное дело.", GOSSIP_SENDER_MAIN, 2);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Misc_LeatherScrap_02:30|t Кожевничество.", GOSSIP_SENDER_MAIN, 3);
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Fabric_Felcloth_Ebon:30|t Портяжное дело.", GOSSIP_SENDER_MAIN, 4);
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\inv_misc_wrench_01:30|t Инжинерное дело.", GOSSIP_SENDER_MAIN, 5);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Fabric_Felcloth_Ebon:30|t Порнтяжное дело.", GOSSIP_SENDER_MAIN, 4);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\inv_misc_wrench_01:30|t Инженерное дело.", GOSSIP_SENDER_MAIN, 5);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\trade_engraving:30|t Наложение чар.", GOSSIP_SENDER_MAIN, 6);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\inv_misc_gem_01:30|t Ювелирное дело.", GOSSIP_SENDER_MAIN, 7);
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "|TInterface\\icons\\INV_Scroll_08:30|t Начертание.", GOSSIP_SENDER_MAIN, 8);

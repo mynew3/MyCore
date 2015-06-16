@@ -429,7 +429,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     }
 
     data.put(0, displaycount);                            // insert right count, count displayed
-    if (matchcount > 30) data.put(4, matchcount*2);      // insert right count, count of matches
+    if (matchcount > 30) data.put(4, matchcount*4);      // insert right count, count of matches
        else data.put(4, matchcount);
 	   
     SendPacket(&data);

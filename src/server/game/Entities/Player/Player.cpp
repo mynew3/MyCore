@@ -1134,7 +1134,7 @@ void Player::ElaborateCheatReport(Player* pPlayer, uint8 uiCheatType)
 
 				if(charcount >= 4 && charcount << 6)
 					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("You have continued to cheat and you will be killed , if you still continue to cheat you will be automaticly banned , be careful !");
+					ChatHandler(pPlayer->GetSession()).PSendSysMessage("У вас обнаружено запрещенное программное обеспечение, отключите его, а так же удалите его со своего компьютера, в следующем предупреждение Вы умрёте, а если Вы и это проигнорируете, то будете заблокированы на 24 часа.");
 					}
 				if(charcount >= 8 && charcount << 10)
 					{
@@ -1145,34 +1145,34 @@ void Player::ElaborateCheatReport(Player* pPlayer, uint8 uiCheatType)
 						{
 						pPlayer->Kill(pPlayer,true);
 						}
-						ChatHandler(pPlayer->GetSession()).PSendSysMessage("Next Time Its More then that  !");
+						ChatHandler(pPlayer->GetSession()).PSendSysMessage("В следующий раз будут приняты более радикальные методы, раз вы не понимаете по нормальному.");
 					}	
 				if(charcount >= 10 && charcount << 14)
 					{
 						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)), 'Anti-Cheat System', '%s', '1')",
+						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)), 'Anti-Cheat System', '%s', '1')",
 						pPlayer->GetSession()->GetAccountId(),
 						strReportType.c_str());
 					}
 				if(charcount >= 16 && charcount << 18)
 					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Why Do You Continue to cheat , do you think you will get better at the game , get items using cheats , this is the third time you are warned , one more time and you will be banned for life automaticly ! ");
+					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Зачем вы пытаетесь обмануть систему? У вас ничего не получится, отключайте стороннее программное обеспечение сейчас же или будете заблокированы.");
 					}
 				if(charcount >= 20 && charcount << 24)
 					{
 						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)), 'Anti-Cheat System', '%s', '1')",
+						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)), 'Anti-Cheat System', '%s', '1')",
 						pPlayer->GetSession()->GetAccountId(),
 						strReportType.c_str());
 					}
 				if(charcount >= 26 && charcount << 28)
 					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("It seems you just do not understand how this works ,  more cheating will result in an IP Ban , Now Stop it you Idoit ! ");
+					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Вы просто не понимаете работы анти-чит системы, теперь подобные выходки приведут к блокировке по IP адресу.");
 					}
 				if(charcount >= 30)
 					{
 						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)),'Anti-Cheat System')",
+						LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)),'Anti-Cheat System')",
 						pPlayer->GetSession()->GetPlayerName().c_str());
 					}
 				}
