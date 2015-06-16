@@ -56,16 +56,36 @@ public:
 				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
 			case 21600: // 6 hours
-				player->AddItem(38186, 100);
+				player->AddItem(33816, 1);
 				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
 			case 43200: // 12 hours
 				player->AddItem(37719, 1);
 				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
 				break;
-			case 86400: // 24 hours
+			case 86400: // 1 day
+				player->AddItem(49693, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+				break;				
+			case 172800: // 2 day
+				player->AddItem(38186, 200);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+				break;				
+			case 345600: // 4 day
+				player->AddItem(44819, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+				break;				
+			case 691200: // 8 day
+				player->AddItem(33079, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+				break;				
+			case 1382400: // 16 day
 				player->AddItem(54860, 1);
 				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");
+				break;				
+			case 2592000: // 30 day
+				player->AddItem(54811, 1);
+				ChatHandler(player->GetSession()).SendSysMessage("Подарок за проведенное время в игре!");			
 /*				
 			case 115200: // 32 hours
 				mailItems.push_back(ItemPair(5133, 1));
