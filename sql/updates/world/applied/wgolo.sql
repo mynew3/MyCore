@@ -1,0 +1,1 @@
+UPDATE `gameobject` SET `spawntimesecs` = -180 WHERE `guid` = 1695;

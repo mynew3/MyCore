@@ -43,6 +43,11 @@ void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
     sCreatureTextMgr->SendChat(me, id, whisperTarget);
 }
 
+void CreatureAI::TalkToMap(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
+{
+    sCreatureTextMgr->SendChat(me, id, whisperTarget, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+}
+
 void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToNearestTarget /* = 50.0f*/)
 {
     if (!creature)
@@ -79,7 +84,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
     // If it can't find a suitable attack target then we should error out.
     if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
     {
-        TC_LOG_ERROR("misc", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
+        TC_LOG_DEBUG("misc", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
         return;
     }
 

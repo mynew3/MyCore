@@ -135,7 +135,7 @@ void Map::LoadMMap(int gx, int gy)
     if (mmapLoadResult)
         TC_LOG_DEBUG("maps", "MMAP loaded name:%s, id:%d, x:%d, y:%d (mmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx, gy, gx, gy);
     else
-        TC_LOG_ERROR("maps", "Could not load MMAP name:%s, id:%d, x:%d, y:%d (mmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx, gy, gx, gy);
+        TC_LOG_DEBUG("maps", "Could not load MMAP name:%s, id:%d, x:%d, y:%d (mmap rep.: x:%d, y:%d)", GetMapName(), GetId(), gx, gy, gx, gy);
 }
 
 void Map::LoadVMap(int gx, int gy)

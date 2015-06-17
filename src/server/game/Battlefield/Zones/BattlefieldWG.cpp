@@ -368,6 +368,12 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             // Award achievement for succeeding in Wintergrasp in 10 minutes or less
             if (!endByTimer && GetTimer() <= 10000)
                 DoCompleteOrIncrementAchievement(ACHIEVEMENTS_WIN_WG_TIMER_10, player);
+            // Complete Quest "Victory in Wintergrasp"
+            if (player->HasAura(SPELL_LIEUTENANT) || player->HasAura(SPELL_CORPORAL))
+            {
+                player->AreaExploredOrEventHappens(13181);
+                player->AreaExploredOrEventHappens(13183);
+            }
         }
     }
 
@@ -936,7 +942,16 @@ void BattlefieldWG::ProcessEvent(WorldObject* obj, uint32 eventId)
                 if (buildingGo->GetGOInfo()->building.damagedEvent == eventId)
                     building->Damaged();
                 else if (buildingGo->GetGOInfo()->building.destroyedEvent == eventId)
+                {
                     building->Destroyed();
+
+                    if (go->GetEntry() == GO_WINTERGRASP_SHADOWSIGHT_TOWER || go->GetEntry() == GO_WINTERGRASP_WINTER_S_EDGE_TOWER || go->GetEntry() == GO_WINTERGRASP_FLAMEWATCH_TOWER)
+                    {
+                        for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
+                        if (Player* player = sObjectAccessor->FindPlayer(*itr))
+                            player->RewardPlayerAndGroupAtEvent(QUEST_WINTERGRASP_SOUTHERN_TOWER_KILL, go);
+                    }
+                }
                 break;
             }
         }
