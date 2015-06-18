@@ -2964,6 +2964,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 53096: // Quetz'lun's Judgment
             case 70743: // AoD Special
             case 70614: // AoD Special - Vegard
+			case 63171: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
                 spellInfo->MaxAffectedTargets = 1;
                 break;
             case 42436: // Drink! (Brewfest)
