@@ -1263,15 +1263,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_AUTOBROADCAST] = sConfigMgr->GetBoolDefault("AutoBroadcast.On", false);
     m_int_configs[CONFIG_AUTOBROADCAST_CENTER] = sConfigMgr->GetIntDefault("AutoBroadcast.Center", 0);
     m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL] = sConfigMgr->GetIntDefault("AutoBroadcast.Timer", 60000);
-   
-	 // anticheat configs
-	m_bool_configs[CONFIG_ANTICHEAT_ENABLE] = sConfigMgr->GetBoolDefault("Anticheat.Enable", false);
-	m_int_configs[CONFIG_ANTICHEAT_MAX_DIFF_TIME] = sConfigMgr->GetIntDefault("Anticheat.MaxDiffTime", 1000);
-	m_int_configs[CONFIG_ANTICHEAT_MIN_DIFF_TIME] = sConfigMgr->GetIntDefault("Anticheat.MinDiffTime", 50);
-	m_float_configs[CONFIG_ANTICHEAT_MAX_DISTANCE_DIFF_ALLOWED] = sConfigMgr->GetFloatDefault("Anticheat.MaxAllowedDistance", 1.0f);
-
-	
-	if (reload)
+    if (reload)
     {
         m_timers[WUPDATE_AUTOBROADCAST].SetInterval(m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL]);
         m_timers[WUPDATE_AUTOBROADCAST].Reset();

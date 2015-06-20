@@ -924,10 +924,6 @@ Player::Player(WorldSession* session): Unit(true)
 
 Player::~Player()
 {
-	// Anticheat System
-	if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
-		CleanTempCheatReports();
-
     // it must be unloaded already in PlayerLogout and accessed only for loggined player
     //m_social = NULL;
 
@@ -963,236 +959,6 @@ Player::~Player()
     delete m_reputationMgr;
 
     sWorld->DecreasePlayerCount();
-}
-
-bool Player::HasFirstReport()
-{
-     QueryResult result = CharacterDatabase.PQuery("SELECT * FROM cheat_first_report WHERE guid = %u",GetGUIDLow());
-
-    if (result)
-        return true;
-    else 
-        return false;
-}
-
-void Player::CleanTempCheatReports()
-{
-    for (uint8 uiI = 0; uiI < 2; uiI++)
-    {
-         
-        if (uiI == 0)
-		{
-            // QueryResult result = CharacterDatabase.PQuery( "DELETE FROM cheat_first_report WHERE guid = %u",GetGUIDLow());
-		}
-        else 
-            QueryResult result = CharacterDatabase.PQuery("DELETE FROM cheat_temp_reports WHERE guid = %u",GetGUIDLow()); 
-		
-    }
-}
-
-void Player::ElaborateCheatReport(Player* pPlayer, uint8 uiCheatType)
-{
-    if (!pPlayer)
-        return;
-
-	if (pPlayer->IsGameMaster())
-		return;
-
-    if (pPlayer->GetSession()->GetSecurity() > SEC_MODERATOR)
-        return;
-
-    // cheatType 1 == SpeedHack
-    // cheatType 2 == FlyHack
-	// cheatType 3 == WalkOnWaterHack
-
-    std::string strReportType = "";
-
-
-    switch(uiCheatType)
-    {
-    case 1:
-        strReportType = "Speed-Hack";
-        break;
-    case 2:
-        strReportType = "Fly-Hack"; 
-	case 3:
-
-		strReportType = "WalkOnWater-Hack";
-        break;
-    default:
-        strReportType = "";
-        break;
-    }
-	
-	std::string name = pPlayer->GetName();
-    CharacterDatabase.EscapeString(name);
-	  
-    if (!HasFirstReport())
-    {
-		CharacterDatabase.PExecute("INSERT INTO cheat_first_report (`guid`,`name`,`latency`,`time`) VALUES (%u,'%s',%u,NOW())",
-			pPlayer->GetGUIDLow(),
-			name.c_str(),
-			pPlayer->GetSession()->GetLatency());
-		ChatHandler(pPlayer->GetSession()).PSendSysMessage("You have been cought cheating and was reported , The Punishment for This offence is a lifetime ip and account and similer accounts ban , you will be punished automaticly if you continue.");
-    }
-    
-    for (uint8 uiI = 0; uiI < 2; uiI++)
-    {
-        if (uiI == 0)
-		{
-			CharacterDatabase.PExecute("INSERT INTO cheat_reports (`guid`,`name`,`latency`,`mapid`,`position_x`,`position_y`,`position_z`,`report`,`time`) VALUES (%u,'%s',%u,%u,%f,%f,%f,'%s',NOW())",
-			pPlayer->GetGUIDLow(),
-			name.c_str(),
-			pPlayer->GetSession()->GetLatency(),
-			pPlayer->GetMapId(),
-			pPlayer->GetPositionX(),
-			pPlayer->GetPositionY(),
-			pPlayer->GetPositionZ(),
-			strReportType.c_str());
-
-		     uint32 charcount = 0;
-			// check character count
-			QueryResult count = CharacterDatabase.PQuery("SELECT COUNT(*) FROM cheat_reports WHERE guid = '%d'", pPlayer->GetGUIDLow());
-			 if (count)
-			 {
-				Field *fields=count->Fetch();
-				charcount = fields[0].GetUInt32();
-			 }
-
-			 // If Its Speed Hacking
-			if(uiCheatType == 1)
-			{
-                if (pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) ||
-                    pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) ||
-                    pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW)
-                    )
-					return;
-
-				if(charcount >= 2 && charcount << 4)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("You have continued to cheat and you will be killed , if you still continue to cheat you will be automaticly banned , be careful !");
-					}
-				if(charcount >= 4 && charcount << 6)
-					{
-						if(pPlayer->isDead())
-						{
-						pPlayer->GetSession()->KickPlayer();
-						}else
-						{
-						pPlayer->Kill(pPlayer,true);
-						}
-						ChatHandler(pPlayer->GetSession()).PSendSysMessage("Next Time Its More then that  !");
-					}	
-				if(charcount >= 6 && charcount << 8)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)), 'Anti-Cheat System', '%s', '1')",
-						pPlayer->GetSession()->GetAccountId(),
-						strReportType.c_str());
-					}
-				if(charcount >= 8 && charcount << 10)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Why Do You Continue to cheat , do you think you will get better at the game , get items using cheats , this is the third time you are warned , one more time and you will be banned for life automaticly ! ");
-					}
-				if(charcount >= 10 && charcount << 12)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)), 'Anti-Cheat System', '%s', '1')",
-						pPlayer->GetSession()->GetAccountId(),
-						strReportType.c_str());
-					}
-				if(charcount >= 12 && charcount << 14)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("It seems you just do not understand how this works ,  more cheating will result in an IP Ban , Now Stop it you Idoit ! ");
-					}
-				if(charcount >= 16)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 DAY)),'Anti-Cheat System')",
-						pPlayer->GetSession()->GetPlayerName().c_str());
-					}
-				}
-			// if its Fly hacking
-			if(uiCheatType == 2 || 3)
-			{
-				if (pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-					return;
-
-				if (pPlayer->HasAuraType(SPELL_AURA_FEATHER_FALL) ||
-					pPlayer->HasAuraType(SPELL_AURA_SAFE_FALL) ||
-					pPlayer->HasAuraType(SPELL_AURA_WATER_WALK) ||
-					pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING) ||
-					pPlayer->HasAuraType(SPELL_AURA_FLY) ||
-					pPlayer->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ||
-					pPlayer->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) ||
-					pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) ||
-					pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) ||
-					pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW) ||
-					pPlayer->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY)
-					)
-					return;
-
-				if(charcount >= 4 && charcount << 6)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("У вас обнаружено запрещенное программное обеспечение, отключите его, а так же удалите его со своего компьютера, в следующем предупреждение Вы умрёте, а если Вы и это проигнорируете, то будете заблокированы на 24 часа.");
-					}
-				if(charcount >= 8 && charcount << 10)
-					{
-						if(pPlayer->isDead())
-						{
-						pPlayer->GetSession()->KickPlayer();
-						}else
-						{
-						pPlayer->Kill(pPlayer,true);
-						}
-						ChatHandler(pPlayer->GetSession()).PSendSysMessage("В следующий раз будут приняты более радикальные методы, раз вы не понимаете по нормальному.");
-					}	
-				if(charcount >= 10 && charcount << 14)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)), 'Anti-Cheat System', '%s', '1')",
-						pPlayer->GetSession()->GetAccountId(),
-						strReportType.c_str());
-					}
-				if(charcount >= 16 && charcount << 18)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Зачем вы пытаетесь обмануть систему? У вас ничего не получится, отключайте стороннее программное обеспечение сейчас же или будете заблокированы.");
-					}
-				if(charcount >= 20 && charcount << 24)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)), 'Anti-Cheat System', '%s', '1')",
-						pPlayer->GetSession()->GetAccountId(),
-						strReportType.c_str());
-					}
-				if(charcount >= 26 && charcount << 28)
-					{
-					ChatHandler(pPlayer->GetSession()).PSendSysMessage("Вы просто не понимаете работы анти-чит системы, теперь подобные выходки приведут к блокировке по IP адресу.");
-					}
-				if(charcount >= 30)
-					{
-						pPlayer->GetSession()->KickPlayer();
-						LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(DATE_ADD(CURDATE(),INTERVAL +1 HOUR)),'Anti-Cheat System')",
-						pPlayer->GetSession()->GetPlayerName().c_str());
-					}
-				}
-		}
-        else 
-		{
-           CharacterDatabase.PExecute("INSERT INTO cheat_temp_reports (`guid`,`name`,`mapid`,`position_x`,`position_y`,`position_z`,`report`,`time`) VALUES (%u,'%s',%u,%f,%f,%f,'%s',NOW())",
-			pPlayer->GetGUIDLow(),
-			name.c_str(),
-			pPlayer->GetMapId(),
-			pPlayer->GetPositionX(),
-			pPlayer->GetPositionY(),
-			pPlayer->GetPositionZ(),
-			strReportType.c_str());
-				// End of Else
-			}
-		// End of For
-		}
-
-	// End of Void
 }
 
 void Player::CleanupsBeforeDelete(bool finalCleanup)
@@ -5769,10 +5535,9 @@ void Player::RepopAtGraveyard()
     // for example from WorldSession::HandleMovementOpcodes
 
     AreaTableEntry const* zone = GetAreaEntryByAreaID(GetAreaId());
-    float groundZ = GetMap()->GetWaterOrGroundLevel(GetPositionX(), GetPositionY(), MAX_HEIGHT);
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
-    if ((!IsAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < (groundZ - 600.0f))
+    if ((!IsAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < -500.0f)
     {
         ResurrectPlayer(0.5f);
         SpawnCorpseBones();
@@ -5809,7 +5574,7 @@ void Player::RepopAtGraveyard()
             GetSession()->SendPacket(&data);
         }
     }
-    else if (GetPositionZ() < (groundZ - 600.0f))
+    else if (GetPositionZ() < -500.0f)
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
 }
 
@@ -22373,24 +22138,6 @@ void Player::UpdateHomebindTime(uint32 time)
         GetSession()->SendPacket(&data);
         TC_LOG_DEBUG("maps", "PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName().c_str(), GetGUIDLow());
     }
-}
-
-bool Player::CanFlyAnticheat(MovementInfo& pMovementInfo)
-{
-    if (IsUnderWater())
-        return false;
-
-    if (HasAuraType(SPELL_AURA_FLY) || HasAuraType(SPELL_AURA_WATER_WALK) || HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED))
-        return false;
-
-    if (Creature* pCreature = GetVehicleCreatureBase())
-        if (pCreature->GetCreatureTemplate()->InhabitType & INHABIT_AIR)
-            return false;
-
-		if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || pMovementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING) || GetMap()->GetGameObject(pMovementInfo.guid))
-        return false;
-
-    return true;
 }
 
 void Player::UpdatePvPState(bool onlyFFA)

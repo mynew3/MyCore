@@ -2408,21 +2408,6 @@ class Player : public Unit, public GridObject<Player>
         Spell* m_spellModTakingSpell;
 
         float GetAverageItemLevel();
-
-		/********************************************************************/
-        /***                 ANTICHEAT SYSTEM                             ***/
-        /********************************************************************/
-        uint32 GetLastPacketTime() { return uiLastPacketTime;}
-        uint32 GetLastOpcode() { return uiLastOpcode; }
-        float GetLastSpeedRate() { return fLastSpeedRate; }
-        void SetLastPacketTime(uint32 uiTime) { uiLastPacketTime = uiTime; }
-        void SetLastSpeedRate(float fSpeedRateRate) { fLastSpeedRate = fSpeedRateRate; }
-        void SetLastOpcode(uint32 uiOpcode) { uiLastOpcode = uiOpcode; }
-        void ElaborateCheatReport(Player* pPlayer, uint8 uiReportType);
-        bool CanFlyAnticheat(MovementInfo& pMovementInfo);
-        bool HasFirstReport();
-        void CleanTempCheatReports();
-
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }
@@ -2703,8 +2688,6 @@ class Player : public Unit, public GridObject<Player>
         Runes *m_runes;
         EquipmentSets m_EquipmentSets;
 
-		bool isAlwaysDetectableFor(WorldObject const* seer) const;
-
         bool CanAlwaysSee(WorldObject const* obj) const override;
 
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
@@ -2714,13 +2697,6 @@ class Player : public Unit, public GridObject<Player>
         bool m_needsZoneUpdate;
 
     private:
-		 /********************************************************************/
-        /***                    ANTICHEAT SYSTEM                           ***/
-        /********************************************************************/
-        uint32  uiLastPacketTime;
-        float fLastSpeedRate;
-        uint32 uiLastOpcode;
-
         // internal common parts for CanStore/StoreItem functions
         InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
         InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
