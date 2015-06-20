@@ -17,6 +17,7 @@
  */
 
 #include "Unit.h"
+#include "AnticheatMgr.h"
 #include "Common.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
@@ -12345,6 +12346,9 @@ void Unit::SetVisible(bool x)
 
 void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 {
+    //if (this->ToPlayer())
+    //    sAnticheatMgr->DisableAnticheatDetection(this->ToPlayer());
+
     int32 main_speed_mod  = 0;
     float stack_bonus     = 1.0f;
     float non_stack_bonus = 1.0f;
@@ -16674,6 +16678,9 @@ void Unit::UpdateObjectVisibility(bool forced)
 
 void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 {
+	//if (this->ToPlayer())
+    //    sAnticheatMgr->DisableAnticheatDetection(this->ToPlayer());
+
     Player* player = ToPlayer();
     if (!player)
     {

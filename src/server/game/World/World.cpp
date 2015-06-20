@@ -21,6 +21,7 @@
 */
 
 #include "World.h"
+#include "AnticheatMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseBot.h"
@@ -1324,6 +1325,13 @@ void World::LoadConfigSettings(bool reload)
 
 	// Awards Per Time
 	m_bool_configs[CONFIG_AWARDS_PER_TIME] = sConfigMgr->GetBoolDefault("player.awards.per.time", false);
+	
+ 	//Anticheat
+    m_bool_configs[CONFIG_ANTICHEAT_ENABLE] = sConfigMgr->GetBoolDefault("Anticheat.Enable", true);
+    m_int_configs[CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION] = sConfigMgr->GetIntDefault("Anticheat.ReportsForIngameWarnings", 70);
+    m_int_configs[CONFIG_ANTICHEAT_DETECTIONS_ENABLED] = sConfigMgr->GetIntDefault("Anticheat.DetectionsEnabled", 31);
+    m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_DAILY_REPORT] = sConfigMgr->GetIntDefault("Anticheat.MaxReportsForDailyReport", 70);
+
 	
     // call ScriptMgr if we're reloading the configuration
     if (reload)
@@ -2981,6 +2989,8 @@ void World::ResetDailyQuests()
 
     // change available dailies
     sPoolMgr->ChangeDailyQuests();
+
+    sAnticheatMgr->ResetDailyReportStates();
 }
 
 void World::LoadDBAllowedSecurityLevel()

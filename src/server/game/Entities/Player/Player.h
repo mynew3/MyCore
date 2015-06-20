@@ -1178,6 +1178,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetTeam() const { return m_bgData.bgTeam && GetBattleground() ? m_bgData.bgTeam : m_team; }
         bool SendRealNameQuery();
         FakePlayers m_FakePlayers;
+		
+		//AnticheatData anticheatData;
 
         void CleanupsBeforeDelete(bool finalCleanup = true) override;
 

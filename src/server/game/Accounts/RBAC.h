@@ -694,6 +694,15 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_INSTANCE_GET_BOSS_STATE                = 796,
     RBAC_PERM_COMMAND_PVPSTATS                               = 797,
     RBAC_PERM_COMMAND_MODIFY_XP                              = 798,
+	
+	// AntiCheat
+	RPAC_PERM_COMMAND_ANTICHEAT                              = 799,
+	RPAC_PERM_COMMAND_ANTICHEAT_GLOBAL                       = 800,
+	RPAC_PERM_COMMAND_ANTICHEAT_PLAYER                       = 801,
+	RPAC_PERM_COMMAND_ANTICHEAT_DELETE                       = 802,
+	RPAC_PERM_COMMAND_ANTICHEAT_HANDLE                       = 803,
+	RPAC_PERM_COMMAND_ANTICHEAT_JAIL                         = 804,
+	RBAC_PERM_SKIP_CHECK_ANTICHEAT                           = 805,
 
     // custom permissions 1000+
     RBAC_PERM_MAX
