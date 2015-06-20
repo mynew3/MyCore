@@ -36,6 +36,7 @@ set(scripts_STAT_SRCS
   Custom/npc_promo.cpp
   Custom/awards_for_time.cpp
   Custom/chat_censure.cpp
+  Custom/boss_cooldown_reset.cpp
 # ${sources_Custom}
 )
 
