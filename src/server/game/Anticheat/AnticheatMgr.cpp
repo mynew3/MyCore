@@ -122,6 +122,8 @@ void AnticheatMgr::StartHackDetection(Player* player, MovementInfo movementInfo,
 
 	if (player->GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_ANTICHEAT))
 		return;
+	if (player->GetAreaId() == 4384 || player->GetAreaId() == 4610)
+		return;
 
     uint32 key = player->GetGUIDLow();
 
