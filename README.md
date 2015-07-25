@@ -1,18 +1,11 @@
-# ![logo](http://www.mediafire.com/convkey/c6ce/dbbp7p4u9sfcfwxzg.jpg?size_id=4) EpicCore
+# ![logo](http://evagames.net/images/bott2.png) EpicCore
 
-+ Platform: Linux, Windows or Mac
-+ Processor with SSE2 support
++ Платформа:Linux
++ Процессор с поддержкой SSE2
 + Boost ≥ 1.49
 + MySQL ≥ 5.1.0
-+ CMake ≥ 2.8.11.2 / 2.8.9 (Windows / Linux)
++ CMake ≥ 2.8.9
 + OpenSSL ≥ 1.0.0
-+ GCC ≥ 4.7.2 (Linux only)
-+ MS Visual Studio ≥ 12 (2013) (Windows only)
++ GCC ≥ 4.7.2
 
 
-## Install
-
-Detailed installation guides are available in the wiki for
-[Windows](http://collab.kpsn.org/display/tc/Win),
-[Linux](http://collab.kpsn.org/display/tc/Linux) and
-[Mac OSX](http://collab.kpsn.org/display/tc/Mac).
