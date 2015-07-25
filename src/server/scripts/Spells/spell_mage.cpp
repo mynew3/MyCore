@@ -44,10 +44,17 @@ enum MageSpells
     SPELL_MAGE_WORGEN_FORM                       = 32819,
     SPELL_MAGE_SHEEP_FORM                        = 32820,
     SPELL_MAGE_GLYPH_OF_ETERNAL_WATER            = 70937,
+	SPELL_MAGE_SHATTERED_BARRIER                 = 55080,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT  = 70908,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
 };
+
+enum MageSpellIcons
+{
+    SPELL_ICON_MAGE_SHATTERED_BARRIER = 2945
+};
+
 
 // Incanter's Absorbtion
 class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
@@ -350,10 +357,22 @@ class spell_mage_ice_barrier : public SpellScriptLoader
                 }
             }
 
+            void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                // Shattered Barrier
+                // Procs only if removed by damage.
+                if (aurEff->GetAmount() <= 0)
+                    if (Unit* caster = GetCaster())
+                        if (AuraEffect* dummy = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, SPELL_ICON_MAGE_SHATTERED_BARRIER, EFFECT_0))
+                            if (roll_chance_i(dummy->GetSpellInfo()->ProcChance))
+                                caster->CastSpell(GetTarget(), SPELL_MAGE_SHATTERED_BARRIER, true, nullptr, aurEff);
+            }
+			
             void Register() override
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_ice_barrier_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_mage_ice_barrier_AuraScript::Trigger, EFFECT_0);
+				AfterEffectRemove += AuraEffectRemoveFn(spell_mage_ice_barrier_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
