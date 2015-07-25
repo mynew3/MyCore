@@ -23,6 +23,7 @@ void AddSC_landro_longshot();
 void AddSC_AwardsForTime();
 void AddSC_System_Censure();
 void AddSC_CD();
+void AddSC_arena_spectator_script();
 /* This is where custom scripts should be added. */
 void AddSC_custom()
 {
@@ -49,5 +50,6 @@ void AddSC_custom()
 	AddSC_AwardsForTime();
 	AddSC_System_Censure();
 	AddSC_CD();
+	AddSC_arena_spectator_script();
  
 }
