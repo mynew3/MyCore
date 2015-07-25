@@ -1208,6 +1208,6 @@ enum TrinityStrings
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
 	
-	LANG_ANTICHEAT_ANNOUNCE                       = 11100
+	LANG_ANTICHEAT_ANNOUNCE                       = 11200
 };
 #endif
