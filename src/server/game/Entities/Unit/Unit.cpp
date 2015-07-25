@@ -2616,11 +2616,18 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 //   Resist
 SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spellInfo, bool CanReflect)
 {
+    // Check for immune
+    if (victim->IsImmunedToSpell(spellInfo))
+        return SPELL_MISS_IMMUNE;
+
     // All positive spells can`t miss
     /// @todo client not show miss log for this spells - so need find info for this in dbc and use it!
     if (spellInfo->IsPositive() && !IsHostileTo(victim)) // prevent from affecting enemy by "positive" spell
-        return SPELL_MISS_NONE;
-
+        return SPELL_MISS_NONE;		
+    // Check for immune
+    if (victim->IsImmunedToDamage(spellInfo))
+        return SPELL_MISS_IMMUNE;
+	
     if (this == victim)
         return SPELL_MISS_NONE;
 
