@@ -37,7 +37,6 @@ set(scripts_STAT_SRCS
   Custom/awards_for_time.cpp
   Custom/chat_censure.cpp
   Custom/boss_cooldown_reset.cpp
-  Сustom/ArenaSpectator/arena_spectator.cpp
 # ${sources_Custom}
 )
 
