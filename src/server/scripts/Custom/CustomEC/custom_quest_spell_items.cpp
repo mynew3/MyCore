@@ -1867,28 +1867,6 @@ public:
     }
 };
 
-// Use this on vehicles that get in combat with players and should not do so.
-class EC_npc_null_vehicle : public CreatureScript
-{
-    public:
-    EC_npc_null_vehicle() : CreatureScript("EC_npc_null_vehicle") { }
-
-    struct EC_npc_null_vehicleAI : public PassiveAI
-    {
-        EC_npc_null_vehicleAI(Creature* creature) : PassiveAI(creature) { }
-
-        bool CanAIAttack(Unit const* /*who*/) const override
-        {
-            // Never attack.
-            return false;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new EC_npc_null_vehicleAI(creature);
-    }
-};
 
 void AddSC_custom_scripts()
 {
@@ -1916,5 +1894,4 @@ void AddSC_custom_scripts()
     new EC_npc_putricide_insect_trap();
     new EC_npc_flesh_eating_insect();
     new EC_spell_pri_prayer_of_mending();
-    new EC_npc_null_vehicle();
 }
