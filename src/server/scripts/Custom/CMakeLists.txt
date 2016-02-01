@@ -14,12 +14,6 @@ set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
   Custom/custom.cpp
   Custom/CustomEC/custom_quest_spell_items.cpp
-  Custom/TrialOfTheChampion/EC_instance_trial_of_the_champion.cpp
-  Custom/TrialOfTheChampion/EC_trial_of_the_champion.h
-  Custom/TrialOfTheChampion/EC_boss_argent_challenge.cpp
-  Custom/TrialOfTheChampion/EC_boss_grand_champions.cpp
-  Custom/TrialOfTheChampion/EC_boss_black_knight.cpp
-  Custom/TrialOfTheChampion/EC_trial_of_the_champion.cpp
   Custom/Ulduar/EC_boss_thorim.cpp
   Custom/WorldEvents/EC_boss_apothecary_trio.cpp
   Custom/WorldEvents/EC_pilgrim.cpp
