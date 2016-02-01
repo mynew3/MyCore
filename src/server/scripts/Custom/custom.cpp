@@ -40,11 +40,6 @@ void AddSC_custom()
     AddSC_CS_Transmogrification();
 	AddSC_fast_arena_start();
 	AddSC_GOMove_commandscript();
-	AddSC_EC_instance_trial_of_the_champion();
-    AddSC_EC_boss_argent_challenge();
-    AddSC_EC_boss_black_knight();
-    AddSC_EC_boss_grand_champions();
-    AddSC_EC_trial_of_the_champion();
 	AddSC_landro_longshot();
 	AddSC_AwardsForTime();
 	AddSC_System_Censure();
